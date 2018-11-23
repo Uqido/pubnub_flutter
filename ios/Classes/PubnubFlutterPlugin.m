@@ -1,5 +1,4 @@
 #import "PubnubFlutterPlugin.h"
-#import "PubNub.h"
 
 @interface PubnubFlutterPlugin ()<PNObjectEventListener>
 
@@ -14,28 +13,53 @@
 @end
 
 @implementation PubnubFlutterPlugin
+
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
-  FlutterMethodChannel* channel = [FlutterMethodChannel
-      methodChannelWithName:@"pubnub_flutter"
-            binaryMessenger:[registrar messenger]];
-  PubnubFlutterPlugin* instance = [[PubnubFlutterPlugin alloc] init];
-  [registrar addMethodCallDelegate:instance channel:channel];
+    FlutterMethodChannel* channel = [FlutterMethodChannel
+                                     methodChannelWithName:@"pubnub_flutter"
+                                     binaryMessenger:[registrar messenger]];
+    PubnubFlutterPlugin* instance = [[PubnubFlutterPlugin alloc] init];
+    [registrar addMethodCallDelegate:instance channel:channel];
+    
+    // Event channel for streams
+    instance.messageStreamHandler = [MessageStreamHandler new];
+    
+    FlutterEventChannel* messageChannel =
+    [FlutterEventChannel eventChannelWithName:@"plugins.flutter.io/pubnub_message"
+                              binaryMessenger:[registrar messenger]];
+    [messageChannel setStreamHandler:instance.messageStreamHandler];
+    
+    // Event channel for streams
+    instance.statusStreamHandler = [StatusStreamHandler new];
+    
+    FlutterEventChannel* statusChannel =
+    [FlutterEventChannel eventChannelWithName:@"plugins.flutter.io/pubnub_status"
+                              binaryMessenger:[registrar messenger]];
+    [statusChannel setStreamHandler:instance.statusStreamHandler];
 }
 
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
-  if ([@"getPlatformVersion" isEqualToString:call.method]) {
-    result([@"iOS " stringByAppendingString:[[UIDevice currentDevice] systemVersion]]);
-  } else if  ([@"subscribe" isEqualToString:call.method]) {
-      NSLog(@"Register Pub Nub");
-
-       result([self handleSubscribe:call]);
-  }  else if  ([@"unsubscribe" isEqualToString:call.method]) {
-      NSLog(@"Unsubscribe Pub Nub");
-      
-      result([self handleUnsubscribe:call]);
-  } else {
-    result(FlutterMethodNotImplemented);
-  }
+    if ([@"getPlatformVersion" isEqualToString:call.method]) {
+        result([@"iOS " stringByAppendingString:[[UIDevice currentDevice] systemVersion]]);
+    } else if  ([@"create" isEqualToString:call.method]) {
+        NSLog(@"Create Pub Nub");
+        
+        result([self handleCreate:call]);
+    } else if  ([@"subscribe" isEqualToString:call.method]) {
+        NSLog(@"Register Pub Nub");
+        
+        result([self handleSubscribe:call]);
+    } else if  ([@"unsubscribe" isEqualToString:call.method]) {
+        NSLog(@"Unsubscribe Pub Nub");
+        
+        result([self handleUnsubscribe:call]);
+    } else if  ([@"unsubscribe_all" isEqualToString:call.method]) {
+        NSLog(@"Unsubscribe Pub Nub");
+        
+        result([self handleUnsubscribe:call]);
+    } else {
+        result(FlutterMethodNotImplemented);
+    }
 }
 
 - (id) handleUnsubscribe:(FlutterMethodCall*)call {
@@ -43,43 +67,42 @@
     
     if(channel) {
         [self.client unsubscribeFromChannels:@[channel] withPresence:NO];
-        //[self.clients[channel] unsubscribeFromAll];
+    } else {
+        [self.clients[channel] unsubscribeFromAll];
+    }
+    
+    return NULL;
+}
+
+- (id) handleCreate:(FlutterMethodCall*)call {
+    NSString *publishKey = call.arguments[@"publishKey"];
+    NSString *subscribeKey = call.arguments[@"subscribeKey"];
+    
+    if(publishKey && subscribeKey) {
+        NSLog(@"Arguments: %@, %@", publishKey, subscribeKey);
+       
+        PNConfiguration *config =
+        [PNConfiguration configurationWithPublishKey:publishKey
+                                        subscribeKey:subscribeKey];
+        config.stripMobilePayload = NO;
+        config.uuid = [NSUUID UUID].UUIDString.lowercaseString;
+      
+        self.client = [PubNub clientWithConfiguration:config];
+        [self.client addListener:self];
     }
     
     return NULL;
 }
 
 - (id) handleSubscribe:(FlutterMethodCall*)call {
-    NSString *publishKey = call.arguments[@"publishKey"];
-    NSString *subscribeKey = call.arguments[@"subscribeKey"];
-    NSString *channel = call.arguments[@"channel"];
+
+    NSArray *channels = call.arguments[@"channels"];
     
-    if(publishKey && subscribeKey && channel) {
-        NSLog(@"Arguments: %@, %@, %@", publishKey, subscribeKey, channel);
-        if(self.configs == NULL) {
-            self.configs = [NSMutableDictionary new];
-        }
+    if(channels) {
+        NSLog(@"Arguments: %@", channels);
         
-        PNConfiguration *config =
-        [PNConfiguration configurationWithPublishKey:publishKey
-                                        subscribeKey:subscribeKey];
-        config.stripMobilePayload = NO;
-        config.uuid = [NSUUID UUID].UUIDString.lowercaseString;
-        
-        self.configs[channel] = config;
-        
-        NSLog(@"Arguments: %@", channel);
-        if(self.clients == NULL) {
-            self.clients = [NSMutableDictionary new];
-        }
-        
-        self.client = [PubNub clientWithConfiguration:self.configs[channel]];
         [self.client addListener:self];
-        [self.client subscribeToChannels:@[channel] withPresence:YES];
-       // self.clients[channel] = [PubNub clientWithConfiguration:self.configs[channel]];
-        //[self.clients[channel] addListener:self];
-        // Subscribe to channel
-        //[self.clients[channel] subscribeToChannels: @[channel] withPresence:YES];
+        [self.client subscribeToChannels:channels withPresence:YES];
     }
     
     return NULL;
@@ -89,6 +112,8 @@
 
 - (void)client:(PubNub *)client didReceiveStatus:(PNStatus *)status {
     NSLog(@"Received status: %@", status.stringifiedOperation);
+    
+    [self.statusStreamHandler sendStatus:status];
 }
 
 - (void)client:(PubNub *)client didReceiveMessage:(PNMessageResult *)message {
@@ -103,8 +128,11 @@
         // Message has been received on channel stored in message.data.channel.
     }
     
+    
     NSLog(@"Received message: %@ on channel %@ at %@", message.data.message[@"msg"],
           message.data.channel, message.data.timetoken);
+    
+    [self.messageStreamHandler sendMessage:message];
 }
 
 // New presence event handling.
@@ -133,3 +161,45 @@
 }
 
 @end
+
+
+@implementation MessageStreamHandler
+
+- (FlutterError*)onListenWithArguments:(id)arguments eventSink:(FlutterEventSink)eventSink {
+    self.eventSink = eventSink;
+    return nil;
+}
+
+- (FlutterError*)onCancelWithArguments:(id)arguments {
+    self.eventSink = nil;
+    return nil;
+}
+
+- (void) sendMessage:(PNMessageResult *)message {
+     if(self.eventSink) {
+         self.eventSink(message.data.message);
+     }
+}
+
+@end
+
+@implementation StatusStreamHandler
+
+- (FlutterError*)onListenWithArguments:(id)arguments eventSink:(FlutterEventSink)eventSink {
+    self.eventSink = eventSink;
+    return nil;
+}
+
+- (FlutterError*)onCancelWithArguments:(id)arguments {
+    self.eventSink = nil;
+    return nil;
+}
+
+- (void) sendStatus:(PNStatus *)status {
+    if(self.eventSink) {
+        self.eventSink(status.stringifiedOperation);
+    }
+}
+
+@end
+

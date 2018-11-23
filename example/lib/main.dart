@@ -13,10 +13,12 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   String _platformVersion = 'Unknown';
+  PubnubFlutter _pubNubFlutter;
 
   @override
   void initState() {
     super.initState();
+    _pubNubFlutter = PubnubFlutter("pub-c-2d1121f9-06c1-4413-8d2e-865f0cfe702a", "sub-c-324ae474-ecfd-11e8-91a4-7e00ddddd7aa");
     initPlatformState();
   }
 
@@ -25,11 +27,7 @@ class _MyAppState extends State<MyApp> {
     String platformVersion;
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
-
-
-
-
-      platformVersion = await PubnubFlutter.platformVersion;
+      platformVersion = await _pubNubFlutter.platformVersion;
     } on PlatformException {
       platformVersion = 'Failed to get platform version.';
     }
@@ -56,12 +54,9 @@ class _MyAppState extends State<MyApp> {
             Text('Running on: $_platformVersion\n'),
             Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children:<Widget>[
-            FlatButton(color: Colors.black12,onPressed: () {PubnubFlutter.unsubscribe(channel: "olivier_channel");},
+            FlatButton(color: Colors.black12,onPressed: () {_pubNubFlutter.unsubscribe(channel: "olivier_channel");},
             child: Text("Unsubscribe")),
-            FlatButton(color: Colors.black12,onPressed: () {PubnubFlutter.subscribe(
-                publishKey: "pub-c-2d1121f9-06c1-4413-8d2e-865f0cfe702a",
-                subscribeKey: "sub-c-324ae474-ecfd-11e8-91a4-7e00ddddd7aa",
-                channel: "olivier_channel");},
+            FlatButton(color: Colors.black12,onPressed: () {_pubNubFlutter.subscribe(["olivier_channel"]);},
                 child: Text("Subscribe"))
               ])
           ],)
