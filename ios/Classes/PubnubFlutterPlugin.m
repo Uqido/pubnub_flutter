@@ -39,9 +39,7 @@
 }
 
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
-    if ([@"getPlatformVersion" isEqualToString:call.method]) {
-        result([@"iOS " stringByAppendingString:[[UIDevice currentDevice] systemVersion]]);
-    } else if  ([@"create" isEqualToString:call.method]) {
+    if  ([@"create" isEqualToString:call.method]) {
         NSLog(@"Create Pub Nub");
         
         result([self handleCreate:call]);

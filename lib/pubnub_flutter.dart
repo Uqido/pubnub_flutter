@@ -10,7 +10,7 @@ class PubnubFlutter {
   EventChannel _messageChannel;
   EventChannel _statusChannel;
 
-  static Stream<String> _onMessageReceived;
+  static Stream<Map> _onMessageReceived;
   static Stream<PubNubStatus> _onStatusReceived;
 
   PubnubFlutter(String publishKey, String subscribeKey) {
@@ -20,11 +20,6 @@ class PubnubFlutter {
 
     _channel.invokeMethod('create', {"publishKey": publishKey, "subscribeKey": subscribeKey});
 
-  }
-
-  Future<String> get platformVersion async {
-    final String version = await _channel.invokeMethod('getPlatformVersion');
-    return version;
   }
 
   Future<void> subscribe(List<String> channels) async {
@@ -44,7 +39,7 @@ class PubnubFlutter {
   }
 
   /// Fires whenever the battery state changes.
-  Stream<String> get onMessageReceived {
+  Stream<Map> get onMessageReceived {
     if (_onMessageReceived == null) {
       _onMessageReceived = _messageChannel
           .receiveBroadcastStream()
@@ -53,7 +48,7 @@ class PubnubFlutter {
     return _onMessageReceived;
   }
 
-  String _parseEvent(String state) {
+  Map _parseEvent(Map state) {
     return state;
   }
 
@@ -70,9 +65,9 @@ class PubnubFlutter {
   /// Fires whenever a status is received.
   PubNubStatus _parseStatus(String state) {
     switch (state) {
-      case 'subscribe':
+      case 'Subscribe':
         return PubNubStatus.subscribed;
-      case 'unsubscribe':
+      case 'Unsubscribe':
         return PubNubStatus.unsubscribed;
       default:
         throw ArgumentError('$state is not a valid PubNubStatus.');
