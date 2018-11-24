@@ -4,12 +4,6 @@
 
 @property (nonatomic, strong) PubNub* client;
 
-// Holds the configs, indexed per channel
-@property (nonatomic, strong) NSMutableDictionary <NSString *, PNConfiguration *> *configs;
-
-// Holds the pubnub clients indexed per channel
-@property (nonatomic, strong) NSMutableDictionary <NSString *, PubNub *> *clients;
-
 @end
 
 @implementation PubnubFlutterPlugin
@@ -36,6 +30,13 @@
     [FlutterEventChannel eventChannelWithName:@"plugins.flutter.io/pubnub_status"
                               binaryMessenger:[registrar messenger]];
     [statusChannel setStreamHandler:instance.statusStreamHandler];
+    
+    instance.errorStreamHandler = [ErrorStreamHandler new];
+    
+    FlutterEventChannel* errorChannel =
+    [FlutterEventChannel eventChannelWithName:@"plugins.flutter.io/pubnub_error"
+                              binaryMessenger:[registrar messenger]];
+    [errorChannel setStreamHandler:instance.errorStreamHandler];
 }
 
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
@@ -47,6 +48,10 @@
         NSLog(@"Register Pub Nub");
         
         result([self handleSubscribe:call]);
+    } else if  ([@"publish" isEqualToString:call.method]) {
+        NSLog(@"Publish Pub Nub");
+        
+        result([self handlePublish:call]);
     } else if  ([@"unsubscribe" isEqualToString:call.method]) {
         NSLog(@"Unsubscribe Pub Nub");
         
@@ -66,7 +71,25 @@
     if(channel) {
         [self.client unsubscribeFromChannels:@[channel] withPresence:NO];
     } else {
-        [self.clients[channel] unsubscribeFromAll];
+        [self.client unsubscribeFromAll];
+    }
+    
+    return NULL;
+}
+
+- (id) handlePublish:(FlutterMethodCall*)call {
+    NSString *channel = call.arguments[@"channel"];
+    NSDictionary *message = call.arguments[@"message"];
+    
+    if(channel && message) {
+        [self.client publish:message
+                              toChannel:channel
+                         withCompletion:^(PNPublishStatus *status) {
+                             if (status.isError) {
+
+                                 [self.errorStreamHandler sendError:@{@"type":@"message", @"message": message}];
+                             }
+                         }];
     }
     
     return NULL;
@@ -196,6 +219,26 @@
 - (void) sendStatus:(PNStatus *)status {
     if(self.eventSink) {
         self.eventSink(status.stringifiedOperation);
+    }
+}
+
+@end
+
+@implementation ErrorStreamHandler
+
+- (FlutterError*)onListenWithArguments:(id)arguments eventSink:(FlutterEventSink)eventSink {
+    self.eventSink = eventSink;
+    return nil;
+}
+
+- (FlutterError*)onCancelWithArguments:(id)arguments {
+    self.eventSink = nil;
+    return nil;
+}
+
+- (void) sendError:(NSDictionary *)error {
+    if(self.eventSink) {
+        self.eventSink(error);
     }
 }
 

@@ -9,14 +9,17 @@ class PubnubFlutter {
   MethodChannel _channel;
   EventChannel _messageChannel;
   EventChannel _statusChannel;
+  EventChannel _errorChannel;
 
   static Stream<Map> _onMessageReceived;
   static Stream<PubNubStatus> _onStatusReceived;
+  static Stream<Map> _onErrorReceived;
 
   PubnubFlutter(String publishKey, String subscribeKey) {
     _channel = MethodChannel('pubnub_flutter');
     _messageChannel = const EventChannel('plugins.flutter.io/pubnub_message');
     _statusChannel = const EventChannel('plugins.flutter.io/pubnub_status');
+    _errorChannel = const EventChannel('plugins.flutter.io/pubnub_error');
 
     _channel.invokeMethod('create', {"publishKey": publishKey, "subscribeKey": subscribeKey});
 
@@ -24,6 +27,11 @@ class PubnubFlutter {
 
   Future<void> subscribe(List<String> channels) async {
     await _channel.invokeMethod('subscribe', {"channels": channels});
+    return;
+  }
+
+  Future<void> publish(Map message, String channel) async {
+    await _channel.invokeMethod('publish', {"message": message, "channel": channel});
     return;
   }
 
@@ -62,6 +70,16 @@ class PubnubFlutter {
     return _onStatusReceived;
   }
 
+  /// Fires whenever the battery state changes.
+  Stream<Map> get onErrorReceived {
+    if (_onErrorReceived == null) {
+      _onErrorReceived = _errorChannel
+          .receiveBroadcastStream()
+          .map((dynamic event) => _parseError(event));
+    }
+    return _onErrorReceived;
+  }
+
   /// Fires whenever a status is received.
   PubNubStatus _parseStatus(String state) {
     switch (state) {
@@ -72,5 +90,9 @@ class PubnubFlutter {
       default:
         throw ArgumentError('$state is not a valid PubNubStatus.');
     }
+  }
+
+  Map _parseError(Map error) {
+    return error;
   }
 }

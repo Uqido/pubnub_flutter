@@ -25,6 +25,10 @@ class _MyAppState extends State<MyApp> {
     _pubNubFlutter.onMessageReceived.listen((message) {
       print("Message:${message}");
     });
+
+    _pubNubFlutter.onErrorReceived.listen((error) {
+      print("Error:${error}");
+    });
   }
 
   @override
