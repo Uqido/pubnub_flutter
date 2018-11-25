@@ -15,13 +15,17 @@ class PubNubFlutter {
   static Stream<PubNubStatus> _onStatusReceived;
   static Stream<Map> _onErrorReceived;
 
-  PubNubFlutter(String publishKey, String subscribeKey) {
+  PubNubFlutter(String publishKey, String subscribeKey, {String uuid}) {
     _channel = MethodChannel('pubnub_flutter');
     _messageChannel = const EventChannel('plugins.flutter.io/pubnub_message');
     _statusChannel = const EventChannel('plugins.flutter.io/pubnub_status');
     _errorChannel = const EventChannel('plugins.flutter.io/pubnub_error');
 
-    _channel.invokeMethod('create', {"publishKey": publishKey, "subscribeKey": subscribeKey});
+    var args = {"publishKey": publishKey, "subscribeKey": subscribeKey};
+    if(uuid != null) {
+      args["uuid"] = uuid;
+    }
+    _channel.invokeMethod('create', args);
 
   }
 
@@ -46,18 +50,23 @@ class PubNubFlutter {
     return;
   }
 
+  Future<String> uuid() async {
+    final String uuid = await _channel.invokeMethod('uuid');
+    return uuid;
+  }
+
   /// Fires whenever the battery state changes.
   Stream<Map> get onMessageReceived {
     if (_onMessageReceived == null) {
       _onMessageReceived = _messageChannel
           .receiveBroadcastStream()
-          .map((dynamic event) => _parseEvent(event));
+          .map((dynamic event) => _parseMessage(event));
     }
     return _onMessageReceived;
   }
 
-  Map _parseEvent(Map state) {
-    return state;
+  Map _parseMessage(Map message) {
+    return message;
   }
 
   /// Fires whenever the battery state changes.

@@ -3,7 +3,7 @@
 @interface PubnubFlutterPlugin ()<PNObjectEventListener>
 
 @property (nonatomic, strong) PubNub* client;
-
+@property (nonatomic, strong) PNConfiguration *config;
 @end
 
 @implementation PubnubFlutterPlugin
@@ -60,6 +60,10 @@
         NSLog(@"Unsubscribe Pub Nub");
         
         result([self handleUnsubscribe:call]);
+    } else if  ([@"uuid" isEqualToString:call.method]) {
+        NSLog(@"get UUID Pub Nub");
+        
+        result([self handleUUID:call]);
     } else {
         result(FlutterMethodNotImplemented);
     }
@@ -75,6 +79,11 @@
     }
     
     return NULL;
+}
+
+- (id) handleUUID:(FlutterMethodCall*)call {
+    
+    return self.config.uuid;
 }
 
 - (id) handlePublish:(FlutterMethodCall*)call {
@@ -98,17 +107,22 @@
 - (id) handleCreate:(FlutterMethodCall*)call {
     NSString *publishKey = call.arguments[@"publishKey"];
     NSString *subscribeKey = call.arguments[@"subscribeKey"];
+    NSString *uuid = call.arguments[@"uuid"];
     
     if(publishKey && subscribeKey) {
         NSLog(@"Arguments: %@, %@", publishKey, subscribeKey);
        
-        PNConfiguration *config =
+        self.config =
         [PNConfiguration configurationWithPublishKey:publishKey
                                         subscribeKey:subscribeKey];
-        config.stripMobilePayload = NO;
-        config.uuid = [NSUUID UUID].UUIDString.lowercaseString;
-      
-        self.client = [PubNub clientWithConfiguration:config];
+        self.config.stripMobilePayload = NO;
+        if(uuid) {
+            self.config.uuid = uuid;
+        } else {
+            self.config.uuid = [NSUUID UUID].UUIDString.lowercaseString;
+        }
+        
+        self.client = [PubNub clientWithConfiguration:self.config];
         [self.client addListener:self];
     }
     
@@ -150,8 +164,8 @@
     }
     
     
-    NSLog(@"Received message: %@ on channel %@ at %@", message.data.message[@"msg"],
-          message.data.channel, message.data.timetoken);
+    NSLog(@"Received message: %@ on channel %@ uuid: %@ at %@", message.data.message[@"msg"],
+          message.data.channel, message.uuid, message.data.timetoken);
     
     [self.messageStreamHandler sendMessage:message];
 }
@@ -198,7 +212,8 @@
 
 - (void) sendMessage:(PNMessageResult *)message {
      if(self.eventSink) {
-         self.eventSink(message.data.message);
+         NSDictionary *result = @{@"uuid": message.uuid, @"channel": message.data.channel, @"message": message.data.message};
+         self.eventSink(result);
      }
 }
 
