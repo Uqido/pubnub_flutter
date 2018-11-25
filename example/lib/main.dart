@@ -11,12 +11,12 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   String _platformVersion = 'Unknown';
-  PubnubFlutter _pubNubFlutter;
+  PubNubFlutter _pubNubFlutter;
 
   @override
   void initState() {
     super.initState();
-    _pubNubFlutter = PubnubFlutter("pub-c-2d1121f9-06c1-4413-8d2e-865f0cfe702a", "sub-c-324ae474-ecfd-11e8-91a4-7e00ddddd7aa");
+    _pubNubFlutter = PubNubFlutter("pub-c-2d1121f9-06c1-4413-8d2e-865f0cfe702a", "sub-c-324ae474-ecfd-11e8-91a4-7e00ddddd7aa");
 
     _pubNubFlutter.onStatusReceived.listen((status) {
       print("Status:${status.toString()}");

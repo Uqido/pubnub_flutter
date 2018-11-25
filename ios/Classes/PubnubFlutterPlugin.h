@@ -1,5 +1,5 @@
 #import <Flutter/Flutter.h>
-#import "PubNub.h"
+#import <PubNub/PubNub.h>
 
 @class MessageStreamHandler;
 @class StatusStreamHandler;

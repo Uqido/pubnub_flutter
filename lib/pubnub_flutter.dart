@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 /// Indicates the current battery state.
 enum PubNubStatus { subscribed, unsubscribed }
 
-class PubnubFlutter {
+class PubNubFlutter {
   MethodChannel _channel;
   EventChannel _messageChannel;
   EventChannel _statusChannel;
@@ -15,7 +15,7 @@ class PubnubFlutter {
   static Stream<PubNubStatus> _onStatusReceived;
   static Stream<Map> _onErrorReceived;
 
-  PubnubFlutter(String publishKey, String subscribeKey) {
+  PubNubFlutter(String publishKey, String subscribeKey) {
     _channel = MethodChannel('pubnub_flutter');
     _messageChannel = const EventChannel('plugins.flutter.io/pubnub_message');
     _statusChannel = const EventChannel('plugins.flutter.io/pubnub_status');

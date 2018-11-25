@@ -1,10 +1,43 @@
-# pubnub_flutter
+# PubNubFlutter
 
-A new flutter plugin project.
+[![pub package](https://img.shields.io/pub/v/pubnub.svg)](https://pub.dartlang.org/packages/pubnub)
 
-## Getting Started
+A Flutter plugin to access PubNub functionalities such as publish, subscribe, status, state and presence..
 
-For help getting started with Flutter, view our online
-[documentation](https://flutter.io/).
+## Usage
+To use this plugin, add `pubnub` as a [dependency in your pubspec.yaml file](https://flutter.io/platform-plugins/).
 
-For help on editing plugin code, view the [documentation](https://flutter.io/developing-packages/#edit-plugin-package).
+### Example
+
+``` dart
+// Import package
+import 'package:pubnub/pubnub.dart';
+
+// Instantiate
+_pubNub = PubNub("publish key", "subscribe key");
+
+// Listen for status changes
+_pubNubFlutter.onStatusReceived.listen((status) {
+    print("Status:${status.toString()}");
+});
+
+// Listen for new message
+_pubNubFlutter.onMessageReceived.listen((message) {
+   print("Message:${message}");
+});
+
+// Listen for errors
+_pubNubFlutter.onErrorReceived.listen((error) {
+    print("Error:${error}");
+});
+
+// Subscribe to at least one channel
+_pubNubFlutter.subscribe(["my_channel"]);
+
+// Unsubscribe from one channel
+_pubNubFlutter.unsubscribe(channel: "my_channel");
+
+// Send message
+_pubNubFlutter.publish({'msg': 'hello world'}, "my_channel");
+
+```
