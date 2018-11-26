@@ -26,7 +26,6 @@ class PubNubFlutter {
       args["uuid"] = uuid;
     }
     _channel.invokeMethod('create', args);
-
   }
 
   Future<void> subscribe(List<String> channels) async {
@@ -55,7 +54,7 @@ class PubNubFlutter {
     return uuid;
   }
 
-  /// Fires whenever the battery state changes.
+  /// Fires whenever the a message is received.
   Stream<Map> get onMessageReceived {
     if (_onMessageReceived == null) {
       _onMessageReceived = _messageChannel
@@ -69,7 +68,7 @@ class PubNubFlutter {
     return message;
   }
 
-  /// Fires whenever the battery state changes.
+  /// Fires whenever the status changes.
   Stream<PubNubStatus> get onStatusReceived {
     if (_onStatusReceived == null) {
       _onStatusReceived = _statusChannel
@@ -79,7 +78,7 @@ class PubNubFlutter {
     return _onStatusReceived;
   }
 
-  /// Fires whenever the battery state changes.
+  /// Fires whenever an error is received.
   Stream<Map> get onErrorReceived {
     if (_onErrorReceived == null) {
       _onErrorReceived = _errorChannel
