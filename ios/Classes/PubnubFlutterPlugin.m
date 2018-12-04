@@ -52,6 +52,14 @@
         NSLog(@"Publish Pub Nub");
         
         result([self handlePublish:call]);
+    } else if  ([@"filter" isEqualToString:call.method]) {
+        NSLog(@"Filter Pub Nub");
+        
+        result([self handleFilter:call]);
+    } else if  ([@"setState" isEqualToString:call.method]) {
+        NSLog(@"set state Pub Nub");
+        
+        result([self handleSetState:call]);
     } else if  ([@"unsubscribe" isEqualToString:call.method]) {
         NSLog(@"Unsubscribe Pub Nub");
         
@@ -81,6 +89,14 @@
     return NULL;
 }
 
+- (id) handleFilter:(FlutterMethodCall*)call {
+    NSString *filter = call.arguments[@"filter"];
+    
+    self.client.filterExpression = filter;
+    
+    return NULL;
+}
+
 - (id) handleUUID:(FlutterMethodCall*)call {
     
     return self.config.uuid;
@@ -89,20 +105,35 @@
 - (id) handlePublish:(FlutterMethodCall*)call {
     NSString *channel = call.arguments[@"channel"];
     NSDictionary *message = call.arguments[@"message"];
-    
-    if(channel && message) {
-        [self.client publish:message
-                              toChannel:channel
-                         withCompletion:^(PNPublishStatus *status) {
-                             if (status.isError) {
+    NSDictionary *metadata = call.arguments[@"metadata"];
 
-                                 [self.errorStreamHandler sendError:@{@"type":@"message", @"message": message}];
-                             }
-                         }];
+    if(channel && message) {
+         __weak __typeof(self) weakSelf = self;
+        [self.client publish:message toChannel:channel withMetadata:metadata completion:^(PNPublishStatus *status) {
+            __strong __typeof(self) strongSelf = weakSelf;
+            [strongSelf handleStatus:status client:strongSelf.client];
+        }];
     }
     
     return NULL;
 }
+
+- (id) handleSetState:(FlutterMethodCall*)call {
+    NSString *channel = call.arguments[@"channel"];
+    NSString *uuid = call.arguments[@"uuid"];
+    NSDictionary *state = call.arguments[@"state"];
+    
+    if(channel && uuid && state) {
+        __weak __typeof(self) weakSelf = self;
+        [self.client setState:state forUUID:uuid onChannel:channel withCompletion:^(PNClientStateUpdateStatus * _Nonnull status) {
+            __strong __typeof(self) strongSelf = weakSelf;
+            [strongSelf handleStatus:status client:strongSelf.client];
+        }];
+    }
+    
+    return NULL;
+}
+
 
 - (id) handleCreate:(FlutterMethodCall*)call {
     NSString *publishKey = call.arguments[@"publishKey"];
@@ -143,6 +174,14 @@
     return NULL;
 }
 
+- (void)handleStatus:(PNStatus *)status client:(PubNub*)client {
+    if (status.isError) {
+        [self.errorStreamHandler sendError:@{@"type":@"state", @"category": status.stringifiedCategory}];
+    } else {
+         [self.statusStreamHandler sendStatus:status];
+    }
+}
+
 #pragma mark - Pubnub delegate methods
 
 - (void)client:(PubNub *)client didReceiveStatus:(PNStatus *)status {
@@ -162,7 +201,6 @@
         
         // Message has been received on channel stored in message.data.channel.
     }
-    
     
     NSLog(@"Received message: %@ on channel %@ uuid: %@ at %@", message.data.message[@"msg"],
           message.data.channel, message.uuid, message.data.timetoken);
@@ -212,6 +250,7 @@
 
 - (void) sendMessage:(PNMessageResult *)message {
      if(self.eventSink) {
+    
          NSDictionary *result = @{@"uuid": message.uuid, @"channel": message.data.channel, @"message": message.data.message};
          self.eventSink(result);
      }
@@ -233,7 +272,7 @@
 
 - (void) sendStatus:(PNStatus *)status {
     if(self.eventSink) {
-        self.eventSink(status.stringifiedOperation);
+        self.eventSink(@{@"operation": status.stringifiedOperation});
     }
 }
 

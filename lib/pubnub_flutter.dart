@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 
 /// Indicates the current battery state.
-enum PubNubStatus { subscribed, unsubscribed }
+//enum PubNubStatus { subscribed, unsubscribed }
 
 class PubNubFlutter {
   MethodChannel _channel;
@@ -11,9 +11,9 @@ class PubNubFlutter {
   EventChannel _statusChannel;
   EventChannel _errorChannel;
 
-  static Stream<Map> _onMessageReceived;
-  static Stream<PubNubStatus> _onStatusReceived;
-  static Stream<Map> _onErrorReceived;
+  Stream<Map> _onMessageReceived;
+  Stream<Map> _onStatusReceived;
+  Stream<Map> _onErrorReceived;
 
   PubNubFlutter(String publishKey, String subscribeKey, {String uuid}) {
     _channel = MethodChannel('pubnub_flutter');
@@ -33,8 +33,26 @@ class PubNubFlutter {
     return;
   }
 
-  Future<void> publish(Map message, String channel) async {
-    await _channel.invokeMethod('publish', {"message": message, "channel": channel});
+  Future<void> filterExpression(String filter) async {
+    await _channel.invokeMethod('filter', {"filter": filter});
+    return;
+  }
+
+  Future<void> publish(Map message, String channel, {Map metadata}) async {
+    Map args = {"message": message, "channel": channel};
+
+    if(metadata != null) {
+      args['metadata'] = metadata;
+    }
+
+    await _channel.invokeMethod('publish', args);
+    return;
+  }
+
+  Future<void> setState(Map state, String channel, String uuid) async {
+    Map args = {"state": state, "channel": channel, "uuid": uuid};
+
+    await _channel.invokeMethod('setState', args);
     return;
   }
 
@@ -69,7 +87,7 @@ class PubNubFlutter {
   }
 
   /// Fires whenever the status changes.
-  Stream<PubNubStatus> get onStatusReceived {
+  Stream<Map> get onStatusReceived {
     if (_onStatusReceived == null) {
       _onStatusReceived = _statusChannel
           .receiveBroadcastStream()
@@ -89,15 +107,8 @@ class PubNubFlutter {
   }
 
   /// Fires whenever a status is received.
-  PubNubStatus _parseStatus(String state) {
-    switch (state) {
-      case 'Subscribe':
-        return PubNubStatus.subscribed;
-      case 'Unsubscribe':
-        return PubNubStatus.unsubscribed;
-      default:
-        throw ArgumentError('$state is not a valid PubNubStatus.');
-    }
+  Map _parseStatus(Map status) {
+    return status;
   }
 
   Map _parseError(Map error) {
