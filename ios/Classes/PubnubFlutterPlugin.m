@@ -109,7 +109,7 @@
 
     if(channel && message) {
          __weak __typeof(self) weakSelf = self;
-        [self.client publish:message toChannel:channel withMetadata:metadata completion:^(PNPublishStatus *status) {
+        [weakSelf.client publish:message toChannel:channel withMetadata:metadata completion:^(PNPublishStatus *status) {
             __strong __typeof(self) strongSelf = weakSelf;
             [strongSelf handleStatus:status client:strongSelf.client];
         }];
@@ -125,7 +125,7 @@
     
     if(channel && uuid && state) {
         __weak __typeof(self) weakSelf = self;
-        [self.client setState:state forUUID:uuid onChannel:channel withCompletion:^(PNClientStateUpdateStatus * _Nonnull status) {
+        [weakSelf.client setState:state forUUID:uuid onChannel:channel withCompletion:^(PNClientStateUpdateStatus * _Nonnull status) {
             __strong __typeof(self) strongSelf = weakSelf;
             [strongSelf handleStatus:status client:strongSelf.client];
         }];

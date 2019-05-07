@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'package:pubnub_flutter/pubnub_flutter.dart';
 
 void main() => runApp(MyApp());
@@ -16,10 +15,10 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    _pubNubFlutter = PubNubFlutter("pub-c-2d1121f9-06c1-4413-8d2e-865f0cfe702a", "sub-c-324ae474-ecfd-11e8-91a4-7e00ddddd7aa");
+    _pubNubFlutter = PubNubFlutter("pub-c-2d1121f9-06c1-4413-8d2e-865f0cfe702a",
+        "sub-c-324ae474-ecfd-11e8-91a4-7e00ddddd7aa");
 
-    _pubNubFlutter.uuid().then((uuid) =>  print('UUID: ${uuid}'));
-
+    _pubNubFlutter.uuid().then((uuid) => print('UUID: ${uuid}'));
 
     _pubNubFlutter.onStatusReceived.listen((status) {
       print("Status:${status.toString()}");
@@ -42,16 +41,28 @@ class _MyAppState extends State<MyApp> {
           title: const Text('PubNub'),
         ),
         body: Center(
-          child:Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-            Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children:<Widget>[
-            FlatButton(color: Colors.black12,onPressed: () {_pubNubFlutter.unsubscribe(channel: "olivier_channel");},
-            child: Text("Unsubscribe")),
-            FlatButton(color: Colors.black12,onPressed: () {_pubNubFlutter.subscribe(["olivier_channel"]);},
-                child: Text("Subscribe"))
-              ])
-          ],)
-        ),
+            child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  FlatButton(
+                      color: Colors.black12,
+                      onPressed: () {
+                        _pubNubFlutter.unsubscribe(channel: "olivier_channel");
+                      },
+                      child: Text("Unsubscribe")),
+                  FlatButton(
+                      color: Colors.black12,
+                      onPressed: () {
+                        _pubNubFlutter
+                            .subscribe(["olivier_channel", "olivier2-channel"]);
+                      },
+                      child: Text("Subscribe"))
+                ])
+          ],
+        )),
       ),
     );
   }

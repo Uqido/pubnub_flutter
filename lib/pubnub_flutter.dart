@@ -22,7 +22,7 @@ class PubNubFlutter {
     _errorChannel = const EventChannel('plugins.flutter.io/pubnub_error');
 
     var args = {"publishKey": publishKey, "subscribeKey": subscribeKey};
-    if(uuid != null) {
+    if (uuid != null) {
       args["uuid"] = uuid;
     }
     _channel.invokeMethod('create', args);
@@ -41,35 +41,29 @@ class PubNubFlutter {
   Future<void> publish(Map message, String channel, {Map metadata}) async {
     Map args = {"message": message, "channel": channel};
 
-    if(metadata != null) {
+    if (metadata != null) {
       args['metadata'] = metadata;
     }
 
-    await _channel.invokeMethod('publish', args);
-    return;
+    return await _channel.invokeMethod('publish', args);
   }
 
   Future<void> setState(Map state, String channel, String uuid) async {
     Map args = {"state": state, "channel": channel, "uuid": uuid};
 
-    await _channel.invokeMethod('setState', args);
-    return;
+    return await _channel.invokeMethod('setState', args);
   }
 
   Future<void> unsubscribe({String channel}) async {
-    final String version = await _channel.invokeMethod('unsubscribe',
-        {"channel": channel});
-    return;
+    return await _channel.invokeMethod('unsubscribe', {"channel": channel});
   }
 
   Future<void> unsubscribeAll() async {
-    final String version = await _channel.invokeMethod('unsubscribe');
-    return;
+    return await _channel.invokeMethod('unsubscribe');
   }
 
   Future<String> uuid() async {
-    final String uuid = await _channel.invokeMethod('uuid');
-    return uuid;
+    return await _channel.invokeMethod('uuid');
   }
 
   /// Fires whenever the a message is received.

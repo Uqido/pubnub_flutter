@@ -5,6 +5,7 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
+import com.pubnub.api.PNConfiguration;
 
 /** PubnubFlutterPlugin */
 public class PubnubFlutterPlugin implements MethodCallHandler {
@@ -12,6 +13,9 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
   public static void registerWith(Registrar registrar) {
     final MethodChannel channel = new MethodChannel(registrar.messenger(), "pubnub_flutter");
     channel.setMethodCallHandler(new PubnubFlutterPlugin());
+
+    PNConfiguration pnConfiguration = new PNConfiguration();
+
   }
 
   @Override
