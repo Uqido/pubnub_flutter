@@ -10,7 +10,7 @@
 
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
     FlutterMethodChannel* channel = [FlutterMethodChannel
-                                     methodChannelWithName:@"pubnub_flutter"
+                                     methodChannelWithName:@"plugins.flutter.io/pubnub_flutter"
                                      binaryMessenger:[registrar messenger]];
     PubnubFlutterPlugin* instance = [[PubnubFlutterPlugin alloc] init];
     [registrar addMethodCallDelegate:instance channel:channel];
@@ -52,10 +52,6 @@
         NSLog(@"Publish Pub Nub");
         
         result([self handlePublish:call]);
-    } else if  ([@"filter" isEqualToString:call.method]) {
-        NSLog(@"Filter Pub Nub");
-        
-        result([self handleFilter:call]);
     } else if  ([@"setState" isEqualToString:call.method]) {
         NSLog(@"set state Pub Nub");
         
@@ -85,14 +81,6 @@
     } else {
         [self.client unsubscribeFromAll];
     }
-    
-    return NULL;
-}
-
-- (id) handleFilter:(FlutterMethodCall*)call {
-    NSString *filter = call.arguments[@"filter"];
-    
-    self.client.filterExpression = filter;
     
     return NULL;
 }
@@ -139,6 +127,7 @@
     NSString *publishKey = call.arguments[@"publishKey"];
     NSString *subscribeKey = call.arguments[@"subscribeKey"];
     NSString *uuid = call.arguments[@"uuid"];
+    NSString *filter = call.arguments[@"filter"];
     
     if(publishKey && subscribeKey) {
         NSLog(@"Arguments: %@, %@", publishKey, subscribeKey);
@@ -149,11 +138,14 @@
         self.config.stripMobilePayload = NO;
         if(uuid) {
             self.config.uuid = uuid;
-        } else {
-            self.config.uuid = [NSUUID UUID].UUIDString.lowercaseString;
+        }
+ 
+        self.client = [PubNub clientWithConfiguration:self.config];
+        
+        if(filter) {
+            self.client.filterExpression = filter;
         }
         
-        self.client = [PubNub clientWithConfiguration:self.config];
         [self.client addListener:self];
     }
     
@@ -167,7 +159,6 @@
     if(channels) {
         NSLog(@"Arguments: %@", channels);
         
-        [self.client addListener:self];
         [self.client subscribeToChannels:channels withPresence:YES];
     }
     

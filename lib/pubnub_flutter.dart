@@ -15,31 +15,30 @@ class PubNubFlutter {
   Stream<Map> _onStatusReceived;
   Stream<Map> _onErrorReceived;
 
-  PubNubFlutter(String publishKey, String subscribeKey, {String uuid}) {
-    _channel = MethodChannel('pubnub_flutter');
+  PubNubFlutter(String publishKey, String subscribeKey,
+      {String uuid, String filter}) {
+    _channel = MethodChannel('plugins.flutter.io/pubnub_flutter');
     _messageChannel = const EventChannel('plugins.flutter.io/pubnub_message');
     _statusChannel = const EventChannel('plugins.flutter.io/pubnub_status');
     _errorChannel = const EventChannel('plugins.flutter.io/pubnub_error');
 
-    var args = {"publishKey": publishKey, "subscribeKey": subscribeKey};
+    var args = {'publishKey': publishKey, 'subscribeKey': subscribeKey};
     if (uuid != null) {
-      args["uuid"] = uuid;
+      args['uuid'] = uuid;
+    }
+    if (filter != null) {
+      args['filter'] = filter;
     }
     _channel.invokeMethod('create', args);
   }
 
   Future<void> subscribe(List<String> channels) async {
-    await _channel.invokeMethod('subscribe', {"channels": channels});
-    return;
-  }
-
-  Future<void> filterExpression(String filter) async {
-    await _channel.invokeMethod('filter', {"filter": filter});
+    await _channel.invokeMethod('subscribe', {'channels': channels});
     return;
   }
 
   Future<void> publish(Map message, String channel, {Map metadata}) async {
-    Map args = {"message": message, "channel": channel};
+    Map args = {'message': message, 'channel': channel};
 
     if (metadata != null) {
       args['metadata'] = metadata;
@@ -49,13 +48,13 @@ class PubNubFlutter {
   }
 
   Future<void> setState(Map state, String channel, String uuid) async {
-    Map args = {"state": state, "channel": channel, "uuid": uuid};
+    Map args = {'state': state, 'channel': channel, 'uuid': uuid};
 
     return await _channel.invokeMethod('setState', args);
   }
 
   Future<void> unsubscribe({String channel}) async {
-    return await _channel.invokeMethod('unsubscribe', {"channel": channel});
+    return await _channel.invokeMethod('unsubscribe', {'channel': channel});
   }
 
   Future<void> unsubscribeAll() async {
