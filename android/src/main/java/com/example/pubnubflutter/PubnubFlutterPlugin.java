@@ -6,8 +6,6 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
-
-import com.google.gson.JsonElement;
 import com.pubnub.api.PNConfiguration;
 import com.pubnub.api.PubNub;
 import com.pubnub.api.callbacks.PNCallback;
@@ -37,11 +35,16 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
     private static final String PUBNUB_ERROR_CHANNEL_NAME =
             "plugins.flutter.io/pubnub_error";
 
-    static private MessageStreamHandler messageStreamHandler;
-    static private StatusStreamHandler statusStreamHandler;
-    static private ErrorStreamHandler errorStreamHandler;
+    private PubNub client;
+    private MessageStreamHandler messageStreamHandler;
+    private StatusStreamHandler statusStreamHandler;
+    private ErrorStreamHandler errorStreamHandler;
 
-    private static PubNub client;
+    private PubnubFlutterPlugin() {
+        messageStreamHandler = new MessageStreamHandler();
+        statusStreamHandler = new StatusStreamHandler();
+        errorStreamHandler = new ErrorStreamHandler();
+    }
 
     /**
      * Plugin registration.
@@ -53,23 +56,23 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
         final MethodChannel channel = new MethodChannel(registrar.messenger(), PUBNUB_FLUTTER_CHANNEL_NAME);
         channel.setMethodCallHandler(instance);
 
-        messageStreamHandler = new MessageStreamHandler();
+
         final EventChannel messageChannel =
                 new EventChannel(registrar.messenger(), PUBNUB_MESSAGE_CHANNEL_NAME);
 
-        messageChannel.setStreamHandler(messageStreamHandler);
+        messageChannel.setStreamHandler(instance.messageStreamHandler);
 
-        statusStreamHandler = new StatusStreamHandler();
+
         final EventChannel statusChannel =
                 new EventChannel(registrar.messenger(), PUBNUB_STATUS_CHANNEL_NAME);
 
-        statusChannel.setStreamHandler(statusStreamHandler);
+        statusChannel.setStreamHandler(instance.statusStreamHandler);
 
-        errorStreamHandler = new ErrorStreamHandler();
+
         final EventChannel errorChannel =
                 new EventChannel(registrar.messenger(), PUBNUB_ERROR_CHANNEL_NAME);
 
-        errorChannel.setStreamHandler(errorStreamHandler);
+        errorChannel.setStreamHandler(instance.errorStreamHandler);
 
     }
 
@@ -192,7 +195,7 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
 
         if(client != null && channels != null && !channels.isEmpty()) {
             System.out.println("SUBSCRIBE");
-                client.subscribe().channels(channels).execute();
+            client.subscribe().channels(channels).execute();
 
             return true;
         }
