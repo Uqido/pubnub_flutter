@@ -8,9 +8,15 @@
 
 @implementation PubnubFlutterPlugin
 
+NSString *const PUBNUB_FLUTTER_CHANNEL_NAME = @"plugins.flutter.io/pubnub_flutter";
+NSString *const PUBNUB_MESSAGE_CHANNEL_NAME = @"plugins.flutter.io/pubnub_message";
+NSString *const PUBNUB_STATUS_CHANNEL_NAME = @"plugins.flutter.io/pubnub_status";
+NSString *const PUBNUB_PRESENCE_CHANNEL_NAME = @"plugins.flutter.io/pubnub_presence";
+NSString *const PUBNUB_ERROR_CHANNEL_NAME = @"plugins.flutter.io/pubnub_error";
+
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
     FlutterMethodChannel* channel = [FlutterMethodChannel
-                                     methodChannelWithName:@"plugins.flutter.io/pubnub_flutter"
+                                     methodChannelWithName:PUBNUB_FLUTTER_CHANNEL_NAME
                                      binaryMessenger:[registrar messenger]];
     PubnubFlutterPlugin* instance = [[PubnubFlutterPlugin alloc] init];
     [registrar addMethodCallDelegate:instance channel:channel];
@@ -19,7 +25,7 @@
     instance.messageStreamHandler = [MessageStreamHandler new];
     
     FlutterEventChannel* messageChannel =
-    [FlutterEventChannel eventChannelWithName:@"plugins.flutter.io/pubnub_message"
+    [FlutterEventChannel eventChannelWithName:PUBNUB_MESSAGE_CHANNEL_NAME
                               binaryMessenger:[registrar messenger]];
     [messageChannel setStreamHandler:instance.messageStreamHandler];
     
@@ -27,7 +33,7 @@
     instance.statusStreamHandler = [StatusStreamHandler new];
     
     FlutterEventChannel* statusChannel =
-    [FlutterEventChannel eventChannelWithName:@"plugins.flutter.io/pubnub_status"
+    [FlutterEventChannel eventChannelWithName:PUBNUB_STATUS_CHANNEL_NAME
                               binaryMessenger:[registrar messenger]];
     [statusChannel setStreamHandler:instance.statusStreamHandler];
     
@@ -35,46 +41,32 @@
     instance.presenceStreamHandler = [PresenceStreamHandler new];
     
     FlutterEventChannel* presenceChannel =
-    [FlutterEventChannel eventChannelWithName:@"plugins.flutter.io/pubnub_presence"
+    [FlutterEventChannel eventChannelWithName:PUBNUB_PRESENCE_CHANNEL_NAME
                               binaryMessenger:[registrar messenger]];
     [presenceChannel setStreamHandler:instance.presenceStreamHandler];
     
     instance.errorStreamHandler = [ErrorStreamHandler new];
     
     FlutterEventChannel* errorChannel =
-    [FlutterEventChannel eventChannelWithName:@"plugins.flutter.io/pubnub_error"
+    [FlutterEventChannel eventChannelWithName:PUBNUB_ERROR_CHANNEL_NAME
                               binaryMessenger:[registrar messenger]];
     [errorChannel setStreamHandler:instance.errorStreamHandler];
 }
 
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
     if  ([@"create" isEqualToString:call.method]) {
-        NSLog(@"Create Pub Nub");
-        
         result([self handleCreate:call]);
     } else if  ([@"subscribe" isEqualToString:call.method]) {
-        NSLog(@"Register Pub Nub");
-        
         result([self handleSubscribe:call]);
     } else if  ([@"publish" isEqualToString:call.method]) {
-        NSLog(@"Publish Pub Nub");
-        
         result([self handlePublish:call]);
     } else if  ([@"setState" isEqualToString:call.method]) {
-        NSLog(@"set state Pub Nub");
-        
         result([self handleSetState:call]);
     } else if  ([@"unsubscribe" isEqualToString:call.method]) {
-        NSLog(@"Unsubscribe Pub Nub");
-        
         result([self handleUnsubscribe:call]);
     } else if  ([@"unsubscribe_all" isEqualToString:call.method]) {
-        NSLog(@"Unsubscribe Pub Nub");
-        
         result([self handleUnsubscribe:call]);
-    } else if  ([@"uuid" isEqualToString:call.method]) {
-        NSLog(@"get UUID Pub Nub");
-        
+    } else if  ([@"uuid" isEqualToString:call.method]) {     
         result([self handleUUID:call]);
     } else {
         result(FlutterMethodNotImplemented);
