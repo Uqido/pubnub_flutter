@@ -10,6 +10,8 @@ import com.pubnub.api.PNConfiguration;
 import com.pubnub.api.PubNub;
 import com.pubnub.api.callbacks.PNCallback;
 import com.pubnub.api.callbacks.SubscribeCallback;
+import com.pubnub.api.enums.PNOperationType;
+import com.pubnub.api.enums.PNStatusCategory;
 import com.pubnub.api.models.consumer.PNPublishResult;
 import com.pubnub.api.models.consumer.PNStatus;
 import com.pubnub.api.models.consumer.presence.PNSetStateResult;
@@ -32,6 +34,8 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
             "plugins.flutter.io/pubnub_message";
     private static final String PUBNUB_STATUS_CHANNEL_NAME =
             "plugins.flutter.io/pubnub_status";
+    private static final String PUBNUB_PRESENCE_CHANNEL_NAME =
+            "plugins.flutter.io/pubnub_presence";
     private static final String PUBNUB_ERROR_CHANNEL_NAME =
             "plugins.flutter.io/pubnub_error";
 
@@ -39,11 +43,13 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
     private MessageStreamHandler messageStreamHandler;
     private StatusStreamHandler statusStreamHandler;
     private ErrorStreamHandler errorStreamHandler;
+    private PresenceStreamHandler presenceStreamHandler;
 
     private PubnubFlutterPlugin() {
         messageStreamHandler = new MessageStreamHandler();
         statusStreamHandler = new StatusStreamHandler();
         errorStreamHandler = new ErrorStreamHandler();
+        presenceStreamHandler = new PresenceStreamHandler();
     }
 
     /**
@@ -67,6 +73,11 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
                 new EventChannel(registrar.messenger(), PUBNUB_STATUS_CHANNEL_NAME);
 
         statusChannel.setStreamHandler(instance.statusStreamHandler);
+
+        final EventChannel presenceChannel =
+                new EventChannel(registrar.messenger(), PUBNUB_PRESENCE_CHANNEL_NAME);
+
+        presenceChannel.setStreamHandler(instance.presenceStreamHandler);
 
 
         final EventChannel errorChannel =
@@ -168,6 +179,7 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
                     @Override
                     public void presence(PubNub pubnub, PNPresenceEventResult presence) {
                         System.out.println("IN PRESENCE");
+                        presenceStreamHandler.sendPresence(presence);
                     }
                 });
 
@@ -195,7 +207,7 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
 
         if(client != null && channels != null && !channels.isEmpty()) {
             System.out.println("SUBSCRIBE");
-            client.subscribe().channels(channels).execute();
+            client.subscribe().channels(channels).withPresence().execute();
 
             return true;
         }
@@ -264,13 +276,112 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
 
     void handleStatus(PNStatus status) {
         if(status.isError()) {
-            Map<String, String> map = new HashMap<>();
-            map.put("type", "state");
-            map.put("category", status.getCategory().toString());
+            Map<String, Object> map = new HashMap<>();
+            map.put("operation", PubnubFlutterPlugin.getOperationAsNumber(status.getOperation()));
+            map.put("error", status.getErrorData().toString());
             errorStreamHandler.sendError(map);
         } else {
             statusStreamHandler.sendStatus(status);
         }
+    }
+
+    static int getCategoryAsNumber(PNStatusCategory category) {
+
+        switch(category) {
+
+            case PNUnknownCategory:
+                return 0;
+            case PNAcknowledgmentCategory:
+                return 1;
+            case PNAccessDeniedCategory:
+                return 2;
+            case PNTimeoutCategory:
+                return 3;
+            case PNNetworkIssuesCategory:
+                return 4;
+            case PNConnectedCategory:
+                return 5;
+            case PNReconnectedCategory:
+                return 6;
+            case PNDisconnectedCategory:
+                return 7;
+            case PNUnexpectedDisconnectCategory:
+                return 8;
+            case PNCancelledCategory:
+                return 9;
+            case PNBadRequestCategory:
+                return 10;
+            case PNMalformedFilterExpressionCategory:
+                return 11;
+            case PNMalformedResponseCategory:
+                return 12;
+            case PNDecryptionErrorCategory:
+                return 13;
+            case PNTLSConnectionFailedCategory:
+                return 14;
+            case PNTLSUntrustedCertificateCategory:
+                return 15;
+            case PNRequestMessageCountExceededCategory:
+                return 16;
+            case PNReconnectionAttemptsExhausted:
+                return 0;
+        }
+
+        return 0;
+    }
+
+    static int getOperationAsNumber(PNOperationType operation) {
+        switch (operation) {
+
+            case PNSubscribeOperation:
+                return 1;
+            case PNUnsubscribeOperation:
+                return 2;
+            case PNPublishOperation:
+                return 3;
+            case PNHistoryOperation:
+                return  4;
+            case PNFetchMessagesOperation:
+                return 5;
+            case PNDeleteMessagesOperation:
+                return 6;
+            case PNWhereNowOperation:
+                return 7;
+            case PNHeartbeatOperation:
+                return 8;
+            case PNSetStateOperation:
+                return 9;
+            case PNAddChannelsToGroupOperation:
+                return 10;
+            case PNRemoveChannelsFromGroupOperation:
+                return 11;
+            case PNChannelGroupsOperation:
+                return 12;
+            case PNRemoveGroupOperation:
+                return 13;
+            case PNChannelsForGroupOperation:
+                return 14;
+            case PNPushNotificationEnabledChannelsOperation:
+                return 15;
+            case PNAddPushNotificationsOnChannelsOperation:
+                return 16;
+            case PNRemovePushNotificationsFromChannelsOperation:
+                return 17;
+            case PNRemoveAllPushNotificationsOperation:
+                return 18;
+            case PNTimeOperation:
+                return 19;
+            case PNHereNowOperation:
+                return 0;
+            case PNGetState:
+                return 0;
+            case PNAccessManagerAudit:
+                return 0;
+            case PNAccessManagerGrant:
+                return 0;
+        }
+
+        return 0;
     }
 
     public abstract static class BaseStreamHandler implements EventChannel.StreamHandler {
@@ -310,8 +421,25 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
         void sendStatus(PNStatus status) {
             if (super.sink != null) {
                 // Send message
-                Map<String, String> map = new HashMap<>();
-                map.put("operation", status.getOperation().toString());
+                Map<String, Object> map = new HashMap<>();
+                map.put("category", PubnubFlutterPlugin.getCategoryAsNumber(status.getCategory()));
+                map.put("operation", PubnubFlutterPlugin.getOperationAsNumber(status.getOperation()));
+                map.put("uuid", status.getUuid());
+                super.sink.success(map);
+            }
+        }
+    }
+
+    public static class PresenceStreamHandler extends BaseStreamHandler {
+
+        void sendPresence(PNPresenceEventResult presence) {
+            if (super.sink != null) {
+                // Send message
+                Map<String, Object> map = new HashMap<>();
+                map.put("channel", presence.getChannel());
+                map.put("event", presence.getEvent());
+                map.put("uuid", presence.getUuid());
+                map.put("occupancy", presence.getOccupancy());
                 super.sink.success(map);
             }
         }
@@ -326,5 +454,6 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
             }
         }
     }
+
 
 }

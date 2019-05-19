@@ -4,10 +4,12 @@
 @class MessageStreamHandler;
 @class StatusStreamHandler;
 @class ErrorStreamHandler;
+@class PresenceStreamHandler;
 
 @interface PubnubFlutterPlugin : NSObject<FlutterPlugin>
 @property (nonatomic, strong) MessageStreamHandler *messageStreamHandler;
 @property (nonatomic, strong) StatusStreamHandler *statusStreamHandler;
+@property (nonatomic, strong) PresenceStreamHandler *presenceStreamHandler;
 @property (nonatomic, strong) ErrorStreamHandler *errorStreamHandler;
 @end
 
@@ -22,6 +24,13 @@
 @property (nonatomic, strong) FlutterEventSink eventSink;
 
 - (void) sendStatus:(PNStatus *)status;
+
+@end
+
+@interface PresenceStreamHandler : NSObject <FlutterStreamHandler>
+@property (nonatomic, strong) FlutterEventSink eventSink;
+
+- (void) sendPresence:(PNPresenceEventResult *)presence;
 
 @end
 

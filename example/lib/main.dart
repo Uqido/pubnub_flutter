@@ -24,6 +24,9 @@ class _MyAppState extends State<MyApp> {
     _pubNubFlutter.onStatusReceived
         .listen((status) => print('Status:${status.toString()}'));
 
+    _pubNubFlutter.onPresenceReceived
+        .listen((presence) => print('Presence:${presence.toString()}'));
+
     _pubNubFlutter.onMessageReceived
         .listen((message) => print('Message:$message'));
 

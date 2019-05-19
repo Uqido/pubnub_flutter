@@ -2,17 +2,16 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 
-/// Indicates the current battery state.
-//enum PubNubStatus { subscribed, unsubscribed }
-
 class PubNubFlutter {
   MethodChannel _channel;
   EventChannel _messageChannel;
   EventChannel _statusChannel;
+  EventChannel _presenceChannel;
   EventChannel _errorChannel;
 
   Stream<Map> _onMessageReceived;
   Stream<Map> _onStatusReceived;
+  Stream<Map> _onPresenceReceived;
   Stream<Map> _onErrorReceived;
 
   PubNubFlutter(String publishKey, String subscribeKey,
@@ -20,6 +19,7 @@ class PubNubFlutter {
     _channel = MethodChannel('plugins.flutter.io/pubnub_flutter');
     _messageChannel = const EventChannel('plugins.flutter.io/pubnub_message');
     _statusChannel = const EventChannel('plugins.flutter.io/pubnub_status');
+    _presenceChannel = const EventChannel('plugins.flutter.io/pubnub_presence');
     _errorChannel = const EventChannel('plugins.flutter.io/pubnub_error');
 
     var args = {'publishKey': publishKey, 'subscribeKey': subscribeKey};
@@ -89,6 +89,16 @@ class PubNubFlutter {
     return _onStatusReceived;
   }
 
+  /// Fires whenever the presence changes.
+  Stream<Map> get onPresenceReceived {
+    if (_onPresenceReceived == null) {
+      _onPresenceReceived = _presenceChannel
+          .receiveBroadcastStream()
+          .map((dynamic event) => _parsePresence(event));
+    }
+    return _onPresenceReceived;
+  }
+
   /// Fires whenever an error is received.
   Stream<Map> get onErrorReceived {
     if (_onErrorReceived == null) {
@@ -101,10 +111,63 @@ class PubNubFlutter {
 
   /// Fires whenever a status is received.
   Map _parseStatus(Map status) {
+    int category = status['category'];
+    status['category'] = PNStatusCategory.values[category];
+    int operation = status['operation'];
+    status['operation'] = PNOperationType.values[operation];
     return status;
   }
 
+  Map _parsePresence(Map presence) {
+    return presence;
+  }
+
   Map _parseError(Map error) {
+    int operation = error['operation'];
+    error['operation'] = PNOperationType.values[operation];
     return error;
   }
+}
+
+enum PNStatusCategory {
+  PNUnknownCategory,
+  PNAcknowledgmentCategory,
+  PNAccessDeniedCategory,
+  PNTimeoutCategory,
+  PNNetworkIssuesCategory,
+  PNConnectedCategory,
+  PNReconnectedCategory,
+  PNDisconnectedCategory,
+  PNUnexpectedDisconnectCategory,
+  PNCancelledCategory,
+  PNBadRequestCategory,
+  PNMalformedFilterExpressionCategory,
+  PNMalformedResponseCategory,
+  PNDecryptionErrorCategory,
+  PNTLSConnectionFailedCategory,
+  PNTLSUntrustedCertificateCategory,
+  PNRequestMessageCountExceededCategory,
+}
+
+enum PNOperationType {
+  PNUnknownOperation,
+  PNSubscribeOperation,
+  PNUnsubscribeOperation,
+  PNPublishOperation,
+  PNHistoryOperation,
+  PNFetchMessagesOperation,
+  PNDeleteMessagesOperation,
+  PNWhereNowOperation,
+  PNHeartbeatOperation,
+  PNSetStateOperation,
+  PNAddChannelsToGroupOperation,
+  PNRemoveChannelsFromGroupOperation,
+  PNChannelGroupsOperation,
+  PNRemoveGroupOperation,
+  PNChannelsForGroupOperation,
+  PNPushNotificationEnabledChannelsOperation,
+  PNAddPushNotificationsOnChannelsOperation,
+  PNRemovePushNotificationsFromChannelsOperation,
+  PNRemoveAllPushNotificationsOperation,
+  PNTimeOperation,
 }
