@@ -8,11 +8,11 @@
 
 @implementation PubnubFlutterPlugin
 
-NSString *const PUBNUB_FLUTTER_CHANNEL_NAME = @"plugins.flutter.io/pubnub_flutter";
-NSString *const PUBNUB_MESSAGE_CHANNEL_NAME = @"plugins.flutter.io/pubnub_message";
-NSString *const PUBNUB_STATUS_CHANNEL_NAME = @"plugins.flutter.io/pubnub_status";
-NSString *const PUBNUB_PRESENCE_CHANNEL_NAME = @"plugins.flutter.io/pubnub_presence";
-NSString *const PUBNUB_ERROR_CHANNEL_NAME = @"plugins.flutter.io/pubnub_error";
+NSString *const PUBNUB_FLUTTER_CHANNEL_NAME = @"flutter.ingenio.com/pubnub_flutter";
+NSString *const PUBNUB_MESSAGE_CHANNEL_NAME = @"flutter.ingenio.com/pubnub_message";
+NSString *const PUBNUB_STATUS_CHANNEL_NAME = @"flutter.ingenio.com/pubnub_status";
+NSString *const PUBNUB_PRESENCE_CHANNEL_NAME = @"flutter.ingenio.com/pubnub_presence";
+NSString *const PUBNUB_ERROR_CHANNEL_NAME = @"flutter.ingenio.com/pubnub_error";
 
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
     FlutterMethodChannel* channel = [FlutterMethodChannel

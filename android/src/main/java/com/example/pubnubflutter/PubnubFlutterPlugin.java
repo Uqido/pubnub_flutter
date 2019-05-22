@@ -28,15 +28,15 @@ import java.util.Map;
 public class PubnubFlutterPlugin implements MethodCallHandler {
 
     private static final String PUBNUB_FLUTTER_CHANNEL_NAME =
-            "plugins.flutter.io/pubnub_flutter";
+            "flutter.ingenio.com/pubnub_flutter";
     private static final String PUBNUB_MESSAGE_CHANNEL_NAME =
-            "plugins.flutter.io/pubnub_message";
+            "flutter.ingenio.com/pubnub_message";
     private static final String PUBNUB_STATUS_CHANNEL_NAME =
-            "plugins.flutter.io/pubnub_status";
+            "flutter.ingenio.com/pubnub_status";
     private static final String PUBNUB_PRESENCE_CHANNEL_NAME =
-            "plugins.flutter.io/pubnub_presence";
+            "flutter.ingenio.com/pubnub_presence";
     private static final String PUBNUB_ERROR_CHANNEL_NAME =
-            "plugins.flutter.io/pubnub_error";
+            "flutter.ingenio.com/pubnub_error";
 
     private PubNub client;
     private MessageStreamHandler messageStreamHandler;

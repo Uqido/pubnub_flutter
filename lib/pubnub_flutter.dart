@@ -110,11 +110,12 @@ class PubNubFlutter {
   /// Create the plugin, UUID and filter expressions are optional and can be used for tracking purposes and filtering purposes, for instance can disable getting messages on the same UUID.
   PubNubFlutter(String publishKey, String subscribeKey,
       {String uuid, String filter}) {
-    _channel = MethodChannel('plugins.flutter.io/pubnub_flutter');
-    _messageChannel = const EventChannel('plugins.flutter.io/pubnub_message');
-    _statusChannel = const EventChannel('plugins.flutter.io/pubnub_status');
-    _presenceChannel = const EventChannel('plugins.flutter.io/pubnub_presence');
-    _errorChannel = const EventChannel('plugins.flutter.io/pubnub_error');
+    _channel = MethodChannel('flutter.ingenio.com/pubnub_flutter');
+    _messageChannel = const EventChannel('flutter.ingenio.com/pubnub_message');
+    _statusChannel = const EventChannel('flutter.ingenio.com/pubnub_status');
+    _presenceChannel =
+        const EventChannel('flutter.ingenio.com/pubnub_presence');
+    _errorChannel = const EventChannel('flutter.ingenio.com/pubnub_error');
 
     var args = {'publishKey': publishKey, 'subscribeKey': subscribeKey};
     if (uuid != null) {
