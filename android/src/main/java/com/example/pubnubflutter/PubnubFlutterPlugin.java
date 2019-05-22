@@ -14,7 +14,6 @@ import com.pubnub.api.enums.PNOperationType;
 import com.pubnub.api.enums.PNStatusCategory;
 import com.pubnub.api.models.consumer.PNPublishResult;
 import com.pubnub.api.models.consumer.PNStatus;
-import com.pubnub.api.models.consumer.presence.PNSetStateResult;
 import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
 import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
 
@@ -111,13 +110,6 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
                     result.error("ERROR", "Cannot Publish.", null);
                 }
                 break;
-            case "setState":
-                if (handleSetState(call)) {
-                    result.success(true);
-                } else {
-                    result.error("ERROR", "Cannot Set State.", null);
-                }
-                break;
             case "unsubscribe":
                 if (handleUnsubscribe(call)) {
                     result.success(true);
@@ -140,7 +132,7 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
         }
     }
 
-    boolean handleCreate(MethodCall call) {
+    private boolean handleCreate(MethodCall call) {
         String publishKey = call.argument("publishKey");
         String subscribeKey = call.argument("subscribeKey");
         String uuid = call.argument("uuid");
@@ -194,7 +186,7 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
         return true;
     }
 
-    String handleUuid() {
+    private String handleUuid() {
         if(client != null) {
             return client.getConfiguration().getUuid();
         }
@@ -202,7 +194,7 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
         return null;
     }
 
-    boolean handleSubscribe(MethodCall call) {
+    private boolean handleSubscribe(MethodCall call) {
         List<String> channels = call.argument("channels");
 
         if(client != null && channels != null && !channels.isEmpty()) {
@@ -215,7 +207,7 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
         return false;
     }
 
-    boolean handleUnsubscribe(MethodCall call) {
+    private boolean handleUnsubscribe(MethodCall call) {
         String channel = call.argument("channel");
 
         if(client != null) {
@@ -253,28 +245,8 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
         return false;
     }
 
-    boolean handleSetState(MethodCall call) {
-        String channel = call.argument("channel");
-        String uuid = call.argument("uuid");
-        String state = call.argument("state");
-
-        if(client != null && channel != null && uuid != null && state != null) {
-            List<String> channels = new ArrayList<>();
-            channels.add(channel);
-            client.setPresenceState().uuid(uuid).channels(channels).async(new PNCallback<PNSetStateResult>() {
-                @Override
-                public void onResponse(PNSetStateResult result, PNStatus status) {
-                    handleStatus(status);
-                }
-            });
-
-            return true;
-        }
-
-        return false;
-    }
-
-    void handleStatus(PNStatus status) {
+    private void handleStatus(PNStatus status) {
+        System.out.println("Status:" + status);
         if(status.isError()) {
             Map<String, Object> map = new HashMap<>();
             map.put("operation", PubnubFlutterPlugin.getOperationAsNumber(status.getOperation()));
@@ -285,7 +257,7 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
         }
     }
 
-    static int getCategoryAsNumber(PNStatusCategory category) {
+    private static int getCategoryAsNumber(PNStatusCategory category) {
 
         switch(category) {
 
@@ -330,7 +302,7 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
         return 0;
     }
 
-    static int getOperationAsNumber(PNOperationType operation) {
+    private static int getOperationAsNumber(PNOperationType operation) {
         switch (operation) {
 
             case PNSubscribeOperation:

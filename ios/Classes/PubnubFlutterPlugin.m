@@ -60,8 +60,6 @@ NSString *const PUBNUB_ERROR_CHANNEL_NAME = @"plugins.flutter.io/pubnub_error";
         result([self handleSubscribe:call]);
     } else if  ([@"publish" isEqualToString:call.method]) {
         result([self handlePublish:call]);
-    } else if  ([@"setState" isEqualToString:call.method]) {
-        result([self handleSetState:call]);
     } else if  ([@"unsubscribe" isEqualToString:call.method]) {
         result([self handleUnsubscribe:call]);
     } else if  ([@"unsubscribe_all" isEqualToString:call.method]) {
@@ -105,23 +103,6 @@ NSString *const PUBNUB_ERROR_CHANNEL_NAME = @"plugins.flutter.io/pubnub_error";
     
     return NULL;
 }
-
-- (id) handleSetState:(FlutterMethodCall*)call {
-    NSString *channel = call.arguments[@"channel"];
-    NSString *uuid = call.arguments[@"uuid"];
-    NSDictionary *state = call.arguments[@"state"];
-    
-    if(channel && uuid && state) {
-        __weak __typeof(self) weakSelf = self;
-        [weakSelf.client setState:state forUUID:uuid onChannel:channel withCompletion:^(PNClientStateUpdateStatus * _Nonnull status) {
-            __strong __typeof(self) strongSelf = weakSelf;
-            [strongSelf handleStatus:status client:strongSelf.client];
-        }];
-    }
-    
-    return NULL;
-}
-
 
 - (id) handleCreate:(FlutterMethodCall*)call {
     NSString *publishKey = call.arguments[@"publishKey"];

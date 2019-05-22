@@ -2,6 +2,100 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 
+/// PubNub Plugin. This plugin is not intended to implement all PubNub functionalities but rather take a minimal approach
+/// for solving most general use cases
+/// Main areas covered by the plugin are
+/// - Instantiate the plugin passing the required PubNub authentication information
+/// - Pass a filter expression when instantiating the plugin
+/// - Subscribe to one or more channels
+/// - Unsubscribe from one channel or all channels
+/// - Publish a message to a channel
+/// - Retrieve UUID if was not set during the plugin instantiation
+/// - Set the state for a channel
+/// {@tool sample}
+///
+/// Instantiate plugin without a filter expression:
+///
+/// ```dart
+/// _pubNubFlutter = PubNubFlutter('pub-c-2d1121f9-06c1-4413-8d2e-0000000000',
+///        'sub-c-324ae474-ecfd-11e8-91a4-00000000000',
+///        uuid: '127c1ab5-fc7f-4c46-8460-3207b6782007');
+/// ```
+/// Instantiate plugin with a filter expression:
+///
+/// ```dart
+/// _pubNubFlutter = PubNubFlutter('pub-c-2d1121f9-06c1-4413-8d2e-0000000000',
+///        'sub-c-324ae474-ecfd-11e8-91a4-00000000000',
+///        uuid: '127c1ab5-fc7f-4c46-8460-3207b6782007',
+///        filter: 'uuid != "127c1ab5-fc7f-4c46-8460-3207b6782007"');
+/// ```
+///
+/// Subscribe to a channel:
+///
+/// ``` dart
+/// _pubNubFlutter.subscribe(['test_channel']);
+/// ```
+///
+/// Unsubscribe from a channel:
+///
+/// ``` dart
+/// _pubNubFlutter.unsubscribe(channel: 'test_channel');
+/// ```
+///
+///  Unsubscribe from all channels:
+///
+/// ``` dart
+/// _pubNubFlutter.unsubscribeAll();
+/// ```
+///
+/// Publish a message to a channel:
+///
+/// ``` dart
+///    _pubNubFlutter.publish(
+///                            {'message': 'Hello World'},
+///                            'test_channel',
+///                          );
+/// ```
+///
+/// Publish a message to a channel passing metadata optional filter expression acts upon:
+///
+/// ``` dart
+///    _pubNubFlutter.publish(
+///                            {'message': 'Hello World'},
+///                            'test_channel',
+///                            metadata: {
+///                             'uuid': '127c1ab5-fc7f-4c46-8460-3207b6782007'
+///                           }
+///                          );
+/// ```
+///
+/// Listen for Messages:
+///
+/// ``` dart
+/// _pubNubFlutter.onMessageReceived
+///        .listen((message) => print('Message:$message'));
+/// ```
+///
+/// Listen for Status:
+///
+/// ``` dart
+///  _pubNubFlutter.onStatusReceived
+///        .listen((status) => print('Status:${status.toString()}'));
+/// ```
+/// Listen to Presence:
+///
+/// ``` dart
+/// _pubNubFlutter.onPresenceReceived
+///        .listen((presence) => print('Presence:${presence.toString()}'));
+/// ```
+///
+/// Listen for Errors:
+///
+/// ``` dart
+/// _pubNubFlutter.onErrorReceived.listen((error) => print('Error:$error'));
+/// ```
+///
+///  {@end-tool}
 class PubNubFlutter {
   MethodChannel _channel;
   EventChannel _messageChannel;
@@ -14,6 +108,7 @@ class PubNubFlutter {
   Stream<Map> _onPresenceReceived;
   Stream<Map> _onErrorReceived;
 
+  /// Create the plugin, UUID and filter expressions are optional and can be used for tracking purposes and filtering purposes, for instance can disable getting messages on the same UUID.
   PubNubFlutter(String publishKey, String subscribeKey,
       {String uuid, String filter}) {
     _channel = MethodChannel('plugins.flutter.io/pubnub_flutter');
@@ -32,11 +127,13 @@ class PubNubFlutter {
     _channel.invokeMethod('create', args);
   }
 
+  /// Subscribe to a list of channels
   Future<void> subscribe(List<String> channels) async {
     await _channel.invokeMethod('subscribe', {'channels': channels});
     return;
   }
 
+  /// Publishes a message on a specified channel, some metadata can be passed and used in conjunction with filter expressions
   Future<void> publish(Map message, String channel, {Map metadata}) async {
     Map args = {'message': message, 'channel': channel};
 
@@ -47,20 +144,19 @@ class PubNubFlutter {
     return await _channel.invokeMethod('publish', args);
   }
 
-  Future<void> setState(Map state, String channel, String uuid) async {
-    Map args = {'state': state, 'channel': channel, 'uuid': uuid};
-
-    return await _channel.invokeMethod('setState', args);
-  }
-
+  /// Unsubscribes from a single channel
   Future<void> unsubscribe({String channel}) async {
     return await _channel.invokeMethod('unsubscribe', {'channel': channel});
   }
 
+  /// Unsubscribes from all channels
   Future<void> unsubscribeAll() async {
     return await _channel.invokeMethod('unsubscribe');
   }
 
+  /// Get the UUID configured for PubNub. Note that when the UUID is passed  in the plugin creation, the returned UUID is the same
+  /// If the UUID has not been passed in the plugin creation, then PubNub assigns a new UUID. This may be important for tracking how many devices/clients are using the API and
+  /// may impact how much the service costs
   Future<String> uuid() async {
     return await _channel.invokeMethod('uuid');
   }
@@ -73,10 +169,6 @@ class PubNubFlutter {
           .map((dynamic event) => _parseMessage(event));
     }
     return _onMessageReceived;
-  }
-
-  Map _parseMessage(Map message) {
-    return message;
   }
 
   /// Fires whenever the status changes.
@@ -118,17 +210,25 @@ class PubNubFlutter {
     return status;
   }
 
+  /// Fires whenever presence is received
   Map _parsePresence(Map presence) {
     return presence;
   }
 
+  /// Fires whenever a PubNub error is received
   Map _parseError(Map error) {
     int operation = error['operation'];
     error['operation'] = PNOperationType.values[operation];
     return error;
   }
+
+  /// Fires whenever a message is received
+  Map _parseMessage(Map message) {
+    return message;
+  }
 }
 
+/// Values for the status category. Not this is an intersection of both iOS and Android enums as both have different values
 enum PNStatusCategory {
   PNUnknownCategory,
   PNAcknowledgmentCategory,
@@ -149,6 +249,7 @@ enum PNStatusCategory {
   PNRequestMessageCountExceededCategory,
 }
 
+/// Operation type coming back in the status
 enum PNOperationType {
   PNUnknownOperation,
   PNSubscribeOperation,
