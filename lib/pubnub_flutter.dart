@@ -11,7 +11,6 @@ import 'package:flutter/services.dart';
 /// - Unsubscribe from one channel or all channels
 /// - Publish a message to a channel
 /// - Retrieve UUID if was not set during the plugin instantiation
-/// - Set the state for a channel
 /// {@tool sample}
 ///
 /// Instantiate plugin without a filter expression:
