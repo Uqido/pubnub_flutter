@@ -16,6 +16,7 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     _pubNubFlutter = PubNubFlutter('pub-c-2d1121f9-06c1-4413-8d2e-865f0cfe702a',
         'sub-c-324ae474-ecfd-11e8-91a4-7e00ddddd7aa',
+        presenceTimeout: 20,
         uuid: '127c1ab5-fc7f-4c46-8460-3207b6782007',
         filter: 'uuid != "127c1ab5-fc7f-4c46-8460-3207b6782007"');
 

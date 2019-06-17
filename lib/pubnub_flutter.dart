@@ -29,6 +29,24 @@ import 'package:flutter/services.dart';
 ///        filter: 'uuid != "127c1ab5-fc7f-4c46-8460-3207b6782007"');
 /// ```
 ///
+/// It is also possible to pass a PubNub authKey if such mechanism is used on the PubNub side for additional security.
+///
+/// ```dart
+/// _pubNubFlutter = PubNubFlutter('pub-c-2d1121f9-06c1-4413-8d2e-0000000000',
+///        'sub-c-324ae474-ecfd-11e8-91a4-00000000000',
+///        authKey: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+///        uuid: '127c1ab5-fc7f-4c46-8460-3207b6782007');
+/// ```
+///
+/// Finally, it is also possible to set a presence timeout value in order to be informed of possible/unexpected disconnections:
+///
+/// ```dart
+/// _pubNubFlutter = PubNubFlutter('pub-c-2d1121f9-06c1-4413-8d2e-0000000000',
+///        'sub-c-324ae474-ecfd-11e8-91a4-00000000000',
+///        presenceTimeOut: 120,
+///        uuid: '127c1ab5-fc7f-4c46-8460-3207b6782007');
+/// ```
+///
 /// Subscribe to a channel:
 ///
 /// ``` dart
@@ -109,7 +127,7 @@ class PubNubFlutter {
 
   /// Create the plugin, UUID and filter expressions are optional and can be used for tracking purposes and filtering purposes, for instance can disable getting messages on the same UUID.
   PubNubFlutter(String publishKey, String subscribeKey,
-      {String uuid, String filter}) {
+      {String authKey, int presenceTimeout, String uuid, String filter}) {
     _channel = MethodChannel('flutter.ingenio.com/pubnub_flutter');
     _messageChannel = const EventChannel('flutter.ingenio.com/pubnub_message');
     _statusChannel = const EventChannel('flutter.ingenio.com/pubnub_status');
@@ -117,12 +135,22 @@ class PubNubFlutter {
         const EventChannel('flutter.ingenio.com/pubnub_presence');
     _errorChannel = const EventChannel('flutter.ingenio.com/pubnub_error');
 
-    var args = {'publishKey': publishKey, 'subscribeKey': subscribeKey};
+    Map<String, dynamic> args = {
+      'publishKey': publishKey,
+      'subscribeKey': subscribeKey
+    };
+
     if (uuid != null) {
       args['uuid'] = uuid;
     }
     if (filter != null) {
       args['filter'] = filter;
+    }
+    if (authKey != null) {
+      args['authKey'] = authKey;
+    }
+    if (presenceTimeout != null && presenceTimeout > 0) {
+      args['presenceTimeout'] = presenceTimeout;
     }
     _channel.invokeMethod('create', args);
   }

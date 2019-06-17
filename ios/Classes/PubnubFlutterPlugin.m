@@ -109,6 +109,8 @@ NSString *const PUBNUB_ERROR_CHANNEL_NAME = @"flutter.ingenio.com/pubnub_error";
     NSString *subscribeKey = call.arguments[@"subscribeKey"];
     NSString *uuid = call.arguments[@"uuid"];
     NSString *filter = call.arguments[@"filter"];
+    NSString *authKey = call.arguments[@"authKey"];
+    NSNumber *presenceTimeout = call.arguments[@"presenceTimeout"];
     
     if(publishKey && subscribeKey) {
         NSLog(@"Arguments: %@, %@", publishKey, subscribeKey);
@@ -119,6 +121,14 @@ NSString *const PUBNUB_ERROR_CHANNEL_NAME = @"flutter.ingenio.com/pubnub_error";
         self.config.stripMobilePayload = NO;
         if(uuid) {
             self.config.uuid = uuid;
+        }
+        
+        if(authKey) {
+            self.config.authKey = authKey;
+        }
+        
+        if(presenceTimeout) {
+            self.config.presenceHeartbeatValue = [presenceTimeout integerValue];
         }
  
         self.client = [PubNub clientWithConfiguration:self.config];
