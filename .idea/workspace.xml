@@ -9,20 +9,7 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="55929d34-4c8c-4e4e-a974-92017b41027b" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/.idea/caches/gradle_models.ser" beforeDir="false" afterPath="$PROJECT_DIR$/android/.idea/caches/gradle_models.ser" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/example/pubnubflutter/PubnubFlutterPlugin.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/com/example/pubnubflutter/PubnubFlutterPlugin.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/ios/.symlinks/plugins/pubnub_flutter/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/pubnub_flutter/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/ios/.symlinks/plugins/pubnub_flutter/android/.idea/caches/gradle_models.ser" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/pubnub_flutter/android/.idea/caches/gradle_models.ser" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/ios/.symlinks/plugins/pubnub_flutter/android/src/main/java/com/example/pubnubflutter/PubnubFlutterPlugin.java" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/pubnub_flutter/android/src/main/java/com/example/pubnubflutter/PubnubFlutterPlugin.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/ios/.symlinks/plugins/pubnub_flutter/example/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/pubnub_flutter/example/lib/main.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/ios/.symlinks/plugins/pubnub_flutter/ios/Classes/PubnubFlutterPlugin.m" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/pubnub_flutter/ios/Classes/PubnubFlutterPlugin.m" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/ios/.symlinks/plugins/pubnub_flutter/lib/pubnub_flutter.dart" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/pubnub_flutter/lib/pubnub_flutter.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/example/lib/main.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ios/Classes/PubnubFlutterPlugin.m" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Classes/PubnubFlutterPlugin.m" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/pubnub_flutter.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/pubnub_flutter.dart" afterDir="false" />
-    </list>
+    <list default="true" id="55929d34-4c8c-4e4e-a974-92017b41027b" name="Default" comment="" />
     <ignored path="$PROJECT_DIR$/.dart_tool/" />
     <ignored path="$PROJECT_DIR$/.idea/" />
     <ignored path="$PROJECT_DIR$/.pub/" />
@@ -41,7 +28,7 @@
         <entry file="file://$PROJECT_DIR$/lib/pubnub_flutter.dart">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="476">
-              <caret line="41" column="4" lean-forward="true" selection-start-line="41" selection-start-column="4" selection-end-line="41" selection-end-column="4" />
+              <caret line="41" column="3" lean-forward="true" selection-start-line="41" selection-start-column="3" selection-end-line="41" selection-end-column="3" />
               <folding>
                 <element signature="e#0#20#0" expanded="true" />
               </folding>
@@ -267,7 +254,7 @@
       <window_info id="Resources Explorer" order="8" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.54406893" visible="true" weight="0.36632654" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.54406893" weight="0.36632654" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.3988827" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -404,7 +391,7 @@
     <entry file="file://$PROJECT_DIR$/lib/pubnub_flutter.dart">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="476">
-          <caret line="41" column="4" lean-forward="true" selection-start-line="41" selection-start-column="4" selection-end-line="41" selection-end-column="4" />
+          <caret line="41" column="3" lean-forward="true" selection-start-line="41" selection-start-column="3" selection-end-line="41" selection-end-column="3" />
           <folding>
             <element signature="e#0#20#0" expanded="true" />
           </folding>

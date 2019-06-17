@@ -136,7 +136,7 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
         String publishKey = call.argument("publishKey");
         String subscribeKey = call.argument("subscribeKey");
         String authKey = call.argument("authKey");
-        int presenceTimeout = call.argument("presenceTimeout");
+        Integer presenceTimeout = call.argument("presenceTimeout");
         String uuid = call.argument("uuid");
         String filter = call.argument("filter");
         PNConfiguration config;
@@ -151,8 +151,8 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
                     config.setAuthKey(authKey);
                 }
 
-                if(presenceTimeout > 0) {
-                    config.setPresenceTimeout(presenceTimeout);
+                if(presenceTimeout != null && presenceTimeout.intValue() > 0) {
+                    config.setPresenceTimeout(presenceTimeout.intValue());
                 }
 
                 if (uuid != null) {
