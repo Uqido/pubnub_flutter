@@ -24,7 +24,8 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     _pubNubFlutter = PubNubFlutter([
       PubNubConfig('client1', 'pub-c-5089170e-d981-4b05-9fe0-8118cb3ae389',
-          'sub-c-3e109ccc-e640-11e8-a679-1679df73129d'),
+          'sub-c-3e109ccc-e640-11e8-a679-1679df73129d',
+          presenceTimeout: 120),
       PubNubConfig('client2', 'pub-c-5089170e-d981-4b05-9fe0-8118cb3ae389',
           'sub-c-3e109ccc-e640-11e8-a679-1679df73129d'),
     ]);
