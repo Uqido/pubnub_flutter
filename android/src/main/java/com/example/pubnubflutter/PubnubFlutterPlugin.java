@@ -433,6 +433,8 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
                 map.put("category", PubnubFlutterPlugin.getCategoryAsNumber(status.getCategory()));
                 map.put("operation", PubnubFlutterPlugin.getOperationAsNumber(status.getOperation()));
                 map.put("uuid", status.getUuid());
+                map.put("channels", status.getAffectedChannels());
+
                 executor.execute(new Runnable() {
                     @Override
                     public void run() {
