@@ -173,19 +173,19 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
 
                 client.addListener(new SubscribeCallback() {
                     @Override
-                    public void status(PubNub pubnub, final PNStatus status) {
+                    public void status(PubNub pubnub, PNStatus status) {
                         System.out.println("IN STATUS");
                         statusStreamHandler.sendStatus(status);
                     }
 
                     @Override
-                    public void message(PubNub pubnub, final PNMessageResult message) {
+                    public void message(PubNub pubnub, PNMessageResult message) {
                         System.out.println("IN MESSAGE");
                         messageStreamHandler.sendMessage(message);
                     }
 
                     @Override
-                    public void presence(PubNub pubnub, final PNPresenceEventResult presence) {
+                    public void presence(PubNub pubnub, PNPresenceEventResult presence) {
                         System.out.println("IN PRESENCE");
                         presenceStreamHandler.sendPresence(presence);
                     }
@@ -403,7 +403,7 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
                 executor.execute(new Runnable() {
                     @Override
                     public void run() {
-                        super.sink.success(map);
+                        MessageStreamHandler.super.sink.success(map);
                     }
                 });
 
@@ -423,7 +423,7 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
                 executor.execute(new Runnable() {
                     @Override
                     public void run() {
-                        super.sink.success(map);
+                        StatusStreamHandler.super.sink.success(map);
                     }
                 });
 
@@ -444,7 +444,7 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
                 executor.execute(new Runnable() {
                     @Override
                     public void run() {
-                        super.sink.success(map);
+                        PresenceStreamHandler.super.sink.success(map);
                     }
                 });
 
@@ -460,7 +460,7 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
                 executor.execute(new Runnable() {
                     @Override
                     public void run() {
-                        super.sink.success(map);
+                        ErrorStreamHandler.super.sink.success(map);
                     }
                 });
             }
