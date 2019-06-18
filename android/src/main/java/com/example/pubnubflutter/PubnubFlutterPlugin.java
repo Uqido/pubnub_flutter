@@ -1,5 +1,8 @@
 package com.example.pubnubflutter;
 
+import android.os.Handler;
+import android.os.Looper;
+
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -21,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executor;
 
 /**
  * PubnubFlutterPlugin
@@ -43,6 +47,7 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
     private StatusStreamHandler statusStreamHandler;
     private ErrorStreamHandler errorStreamHandler;
     private PresenceStreamHandler presenceStreamHandler;
+
 
     private PubnubFlutterPlugin() {
         messageStreamHandler = new MessageStreamHandler();
@@ -168,19 +173,19 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
 
                 client.addListener(new SubscribeCallback() {
                     @Override
-                    public void status(PubNub pubnub, PNStatus status) {
+                    public void status(PubNub pubnub, final PNStatus status) {
                         System.out.println("IN STATUS");
                         statusStreamHandler.sendStatus(status);
                     }
 
                     @Override
-                    public void message(PubNub pubnub, PNMessageResult message) {
+                    public void message(PubNub pubnub, final PNMessageResult message) {
                         System.out.println("IN MESSAGE");
                         messageStreamHandler.sendMessage(message);
                     }
 
                     @Override
-                    public void presence(PubNub pubnub, PNPresenceEventResult presence) {
+                    public void presence(PubNub pubnub, final PNPresenceEventResult presence) {
                         System.out.println("IN PRESENCE");
                         presenceStreamHandler.sendPresence(presence);
                     }
@@ -323,7 +328,7 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
             case PNPublishOperation:
                 return 3;
             case PNHistoryOperation:
-                return  4;
+                return 4;
             case PNFetchMessagesOperation:
                 return 5;
             case PNDeleteMessagesOperation:
@@ -369,6 +374,7 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
 
     public abstract static class BaseStreamHandler implements EventChannel.StreamHandler {
         private EventChannel.EventSink sink;
+        protected Executor executor = new MainThreadExecutor();
 
         @Override
         public void onListen(Object o, EventChannel.EventSink eventSink) {
@@ -388,13 +394,19 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
 
                 System.out.println("publisher: " + message.getPublisher());
 
-                Map<String, String> map = new HashMap<>();
+                final Map<String, String> map = new HashMap<>();
                 map.put("uuid", message.getPublisher());
                 map.put("channel", message.getChannel());
                 map.put("message", message.getMessage().toString());
 
                 // Send message
-                super.sink.success(map);
+                executor.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        super.sink.success(map);
+                    }
+                });
+
             }
         }
     }
@@ -404,11 +416,17 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
         void sendStatus(PNStatus status) {
             if (super.sink != null) {
                 // Send message
-                Map<String, Object> map = new HashMap<>();
+                final Map<String, Object> map = new HashMap<>();
                 map.put("category", PubnubFlutterPlugin.getCategoryAsNumber(status.getCategory()));
                 map.put("operation", PubnubFlutterPlugin.getOperationAsNumber(status.getOperation()));
                 map.put("uuid", status.getUuid());
-                super.sink.success(map);
+                executor.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        super.sink.success(map);
+                    }
+                });
+
             }
         }
     }
@@ -418,23 +436,44 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
         void sendPresence(PNPresenceEventResult presence) {
             if (super.sink != null) {
                 // Send message
-                Map<String, Object> map = new HashMap<>();
+                final Map<String, Object> map = new HashMap<>();
                 map.put("channel", presence.getChannel());
                 map.put("event", presence.getEvent());
                 map.put("uuid", presence.getUuid());
                 map.put("occupancy", presence.getOccupancy());
-                super.sink.success(map);
+                executor.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        super.sink.success(map);
+                    }
+                });
+
             }
         }
     }
 
     public static class ErrorStreamHandler extends BaseStreamHandler {
 
-        void sendError(Map map) {
+        void sendError(final Map map) {
             if (super.sink != null) {
                 // Send message
-                super.sink.success(map);
+                executor.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        super.sink.success(map);
+                    }
+                });
             }
+        }
+    }
+
+    private static class MainThreadExecutor implements Executor {
+
+        final Handler handler = new Handler(Looper.getMainLooper());
+
+        @Override
+        public void execute(Runnable command) {
+            handler.post(command);
         }
     }
 
