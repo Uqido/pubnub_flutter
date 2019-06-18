@@ -42,12 +42,14 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
     private static final String PUBNUB_ERROR_CHANNEL_NAME =
             "flutter.ingenio.com/pubnub_error";
 
-    private PubNub client;
+    private static final String CLIENT_NAME_KEY = "clientName";
+
+    private Map<String, PubNub> clients = new HashMap<>();
+
     private MessageStreamHandler messageStreamHandler;
     private StatusStreamHandler statusStreamHandler;
     private ErrorStreamHandler errorStreamHandler;
     private PresenceStreamHandler presenceStreamHandler;
-
 
     private PubnubFlutterPlugin() {
         messageStreamHandler = new MessageStreamHandler();
@@ -123,7 +125,7 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
                 }
                 break;
             case "uuid":
-                String uuid = handleUuid();
+                String uuid = handleUuid(call);
 
                 if (uuid != null) {
                     result.success(uuid);
@@ -137,74 +139,82 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
         }
     }
 
+    // PubNubFlutter({'clients':[{'clientName':'client1','pubKey':'xxx','subKey': 'rrrr', 'authKey':'wwwww', 'presenceTimeout':20, 'uuid':'ytttttt', 'filter':'vddsfdsfds'},
+    ////                 'client2':{'subKey': 'ttttt', 'authKey':'fffff'}});
     private boolean handleCreate(MethodCall call) {
-        String publishKey = call.argument("publishKey");
-        String subscribeKey = call.argument("subscribeKey");
-        String authKey = call.argument("authKey");
-        Integer presenceTimeout = call.argument("presenceTimeout");
-        String uuid = call.argument("uuid");
-        String filter = call.argument("filter");
-        PNConfiguration config;
 
-        if(client == null) {
-            if (publishKey != null && subscribeKey != null) {
-                config = new PNConfiguration();
-                config.setPublishKey(publishKey);
-                config.setSubscribeKey(subscribeKey);
+        List<HashMap> clientList = call.argument("clients");
 
-                if(authKey != null) {
-                    config.setAuthKey(authKey);
-                }
+        System.out.println("IN HANDLE CREATE: ");
 
-                if(presenceTimeout != null && presenceTimeout.intValue() > 0) {
-                    config.setPresenceTimeout(presenceTimeout.intValue());
-                }
+        for (Map<String, Object> client : clientList) {
+            String clientName = client.get(CLIENT_NAME_KEY).toString();
+            System.out.println("CLIENT NAME: " + clientName);
 
-                if (uuid != null) {
-                    config.setUuid(uuid);
-                }
-                if (filter != null) {
-                    config.setFilterExpression(filter);
-                }
+            if (!clients.containsKey(clientName)) {
+                Object publishKey = client.get("publishKey");
+                Object subscribeKey = client.get("subscribeKey");
+                Object authKey = client.get("authKey");
+                Object presenceTimeout = client.get("presenceTimeout");
+                Object uuid = client.get("uuid");
+                Object filter = client.get("filter");
+                PNConfiguration config;
 
-                client = new PubNub(config);
+                if (publishKey != null && subscribeKey != null) {
+                    System.out.println("CREATE CLIENT: " + clientName);
 
-                System.out.println("CREATE: " + client);
+                    config = new PNConfiguration();
+                    config.setPublishKey(publishKey.toString());
+                    config.setSubscribeKey(subscribeKey.toString());
 
-                client.addListener(new SubscribeCallback() {
-                    @Override
-                    public void status(PubNub pubnub, PNStatus status) {
-                        System.out.println("IN STATUS");
-                        statusStreamHandler.sendStatus(status);
+                    if (authKey != null) {
+                        config.setAuthKey(authKey.toString());
                     }
 
-                    @Override
-                    public void message(PubNub pubnub, PNMessageResult message) {
-                        System.out.println("IN MESSAGE");
-                        messageStreamHandler.sendMessage(message);
+                    if (presenceTimeout != null && presenceTimeout instanceof Integer && ((Integer) presenceTimeout).intValue() > 0) {
+                        config.setPresenceTimeout(((Integer) presenceTimeout).intValue());
                     }
 
-                    @Override
-                    public void presence(PubNub pubnub, PNPresenceEventResult presence) {
-                        System.out.println("IN PRESENCE");
-                        presenceStreamHandler.sendPresence(presence);
+                    if (uuid != null) {
+                        config.setUuid(uuid.toString());
                     }
-                });
+                    if (filter != null) {
+                        config.setFilterExpression(filter.toString());
+                    }
 
-                return true;
+                    clients.put(clientName, new PubNub(config));
+
+                    clients.get(clientName).addListener(new SubscribeCallback() {
+                        @Override
+                        public void status(PubNub pubnub, PNStatus status) {
+                            System.out.println("IN STATUS");
+                            statusStreamHandler.sendStatus(status);
+                        }
+
+                        @Override
+                        public void message(PubNub pubnub, PNMessageResult message) {
+                            System.out.println("IN MESSAGE");
+                            messageStreamHandler.sendMessage(message);
+                        }
+
+                        @Override
+                        public void presence(PubNub pubnub, PNPresenceEventResult presence) {
+                            System.out.println("IN PRESENCE");
+                            presenceStreamHandler.sendPresence(presence);
+                        }
+                    });
+                }
             }
-            System.out.println("CREATE FAILED");
-
-
-            return false;
         }
 
         return true;
+
     }
 
-    private String handleUuid() {
-        if(client != null) {
-            return client.getConfiguration().getUuid();
+    private String handleUuid(MethodCall call) {
+        String clientName = call.argument(CLIENT_NAME_KEY);
+        if(clientName != null && clients.get(clientName) != null) {
+            return clients.get(clientName).getConfiguration().getUuid();
         }
 
         return null;
@@ -212,10 +222,11 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
 
     private boolean handleSubscribe(MethodCall call) {
         List<String> channels = call.argument("channels");
+        String clientName = call.argument(CLIENT_NAME_KEY);
 
-        if(client != null && channels != null && !channels.isEmpty()) {
+        if(clientName != null && clients.get(clientName) != null && channels != null && !channels.isEmpty()) {
             System.out.println("SUBSCRIBE");
-            client.subscribe().channels(channels).withPresence().execute();
+            clients.get(clientName).subscribe().channels(channels).withPresence().execute();
 
             return true;
         }
@@ -225,16 +236,17 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
 
     private boolean handleUnsubscribe(MethodCall call) {
         String channel = call.argument("channel");
+        String clientName = call.argument(CLIENT_NAME_KEY);
 
-        if(client != null) {
+        if(clientName != null && clients.get(clientName) != null) {
             if (channel != null) {
                 List<String> channels = new ArrayList<>();
                 channels.add(channel);
-                client.unsubscribe().channels(channels).execute();
+                clients.get(clientName).unsubscribe().channels(channels).execute();
 
                 return true;
             } else {
-                client.unsubscribeAll();
+                clients.get(clientName).unsubscribeAll();
                 return true;
             }
         }
@@ -243,12 +255,13 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
     }
 
     private boolean handlePublish(MethodCall call) {
+        String clientName = call.argument(CLIENT_NAME_KEY);
         String channel = call.argument("channel");
         Map message = call.argument("message");
         Map metadata = call.argument("metadata");
 
-        if(client != null && channel != null && message != null) {
-            client.publish().channel(channel).message(message).meta(metadata).async(new PNCallback<PNPublishResult>() {
+        if(clientName != null && clients.get(clientName) != null && channel != null && message != null) {
+            clients.get(clientName).publish().channel(channel).message(message).meta(metadata).async(new PNCallback<PNPublishResult>() {
                 @Override
                 public void onResponse(PNPublishResult result, PNStatus status) {
                     handleStatus(status);
