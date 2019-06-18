@@ -50,6 +50,7 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
 
 
     private PubnubFlutterPlugin() {
+        System.out.println("PubnubFlutterPlugin constructor");
         messageStreamHandler = new MessageStreamHandler();
         statusStreamHandler = new StatusStreamHandler();
         errorStreamHandler = new ErrorStreamHandler();
@@ -60,6 +61,7 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
      * Plugin registration.
      */
     public static void registerWith(Registrar registrar) {
+        System.out.println("PubnubFlutterPlugin registerWith");
 
         PubnubFlutterPlugin instance = new PubnubFlutterPlugin();
 
@@ -138,6 +140,7 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
     }
 
     private boolean handleCreate(MethodCall call) {
+        System.out.println("PubnubFlutterPlugin handleCreate");
         String publishKey = call.argument("publishKey");
         String subscribeKey = call.argument("subscribeKey");
         String authKey = call.argument("authKey");
