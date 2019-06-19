@@ -113,32 +113,26 @@ import 'package:flutter/services.dart';
 /// ```
 ///
 ///  {@end-tool}
-class PubNubFlutter {
-  MethodChannel _channel;
-  EventChannel _messageChannel;
-  EventChannel _statusChannel;
-  EventChannel _presenceChannel;
-  EventChannel _errorChannel;
+///
+///
+///
+class PubNubConfig {
+  PubNubConfig(this.clientName, this.publishKey, this.subscribeKey,
+      {this.authKey, this.presenceTimeout, this.uuid, this.filter});
 
-  Stream<Map> _onMessageReceived;
-  Stream<Map> _onStatusReceived;
-  Stream<Map> _onPresenceReceived;
-  Stream<Map> _onErrorReceived;
+  final String clientName;
+  final String publishKey;
+  final String subscribeKey;
+  final String authKey;
+  final int presenceTimeout;
+  final String uuid;
+  final String filter;
 
-  /// Create the plugin, UUID and filter expressions are optional and can be used for tracking purposes and filtering purposes, for instance can disable getting messages on the same UUID.
-  PubNubFlutter(String publishKey, String subscribeKey,
-      {String authKey, int presenceTimeout, String uuid, String filter}) {
-    print('PubNubFlutter constructor');
-    _channel = MethodChannel('flutter.ingenio.com/pubnub_flutter');
-    _messageChannel = const EventChannel('flutter.ingenio.com/pubnub_message');
-    _statusChannel = const EventChannel('flutter.ingenio.com/pubnub_status');
-    _presenceChannel =
-        const EventChannel('flutter.ingenio.com/pubnub_presence');
-    _errorChannel = const EventChannel('flutter.ingenio.com/pubnub_error');
-
+  Map<String, dynamic> toMap() {
     Map<String, dynamic> args = {
+      'clientName': clientName,
       'publishKey': publishKey,
-      'subscribeKey': subscribeKey
+      'subscribeKey': subscribeKey,
     };
 
     if (uuid != null) {
@@ -153,18 +147,57 @@ class PubNubFlutter {
     if (presenceTimeout != null && presenceTimeout > 0) {
       args['presenceTimeout'] = presenceTimeout;
     }
-    _channel.invokeMethod('create', args);
+
+    return args;
+  }
+}
+
+class PubNubFlutter {
+  MethodChannel _channel;
+  EventChannel _messageChannel;
+  EventChannel _statusChannel;
+  EventChannel _presenceChannel;
+  EventChannel _errorChannel;
+
+  Stream<Map> _onMessageReceived;
+  Stream<Map> _onStatusReceived;
+  Stream<Map> _onPresenceReceived;
+  Stream<Map> _onErrorReceived;
+
+  /// Create the plugin, UUID and filter expressions are optional and can be used for tracking purposes and filtering purposes, for instance can disable getting messages on the same UUID.
+  PubNubFlutter(List<PubNubConfig> configList) {
+    print('PubNubFlutter constructor');
+    _channel = MethodChannel('flutter.ingenio.com/pubnub_flutter');
+    _messageChannel = const EventChannel('flutter.ingenio.com/pubnub_message');
+    _statusChannel = const EventChannel('flutter.ingenio.com/pubnub_status');
+    _presenceChannel =
+        const EventChannel('flutter.ingenio.com/pubnub_presence');
+    _errorChannel = const EventChannel('flutter.ingenio.com/pubnub_error');
+
+    List<Map<String, dynamic>> args = [];
+
+    for (PubNubConfig config in configList) {
+      args.add(config.toMap());
+    }
+
+    _channel.invokeMethod('create', {'clients': args});
   }
 
   /// Subscribe to a list of channels
-  Future<void> subscribe(List<String> channels) async {
-    await _channel.invokeMethod('subscribe', {'channels': channels});
+  Future<void> subscribe(String clientName, List<String> channels) async {
+    await _channel.invokeMethod(
+        'subscribe', {'clientName': clientName, 'channels': channels});
     return;
   }
 
   /// Publishes a message on a specified channel, some metadata can be passed and used in conjunction with filter expressions
-  Future<void> publish(Map message, String channel, {Map metadata}) async {
-    Map args = {'message': message, 'channel': channel};
+  Future<void> publish(String clientName, Map message, String channel,
+      {Map metadata}) async {
+    Map args = {
+      'clientName': clientName,
+      'message': message,
+      'channel': channel
+    };
 
     if (metadata != null) {
       args['metadata'] = metadata;
@@ -174,20 +207,22 @@ class PubNubFlutter {
   }
 
   /// Unsubscribes from a single channel
-  Future<void> unsubscribe({String channel}) async {
-    return await _channel.invokeMethod('unsubscribe', {'channel': channel});
+  Future<void> unsubscribe(String clientName, String channel) async {
+    return await _channel.invokeMethod(
+        'unsubscribe', {'clientName': clientName, 'channel': channel});
   }
 
   /// Unsubscribes from all channels
-  Future<void> unsubscribeAll() async {
-    return await _channel.invokeMethod('unsubscribe');
+  Future<void> unsubscribeAll(String clientName) async {
+    return await _channel
+        .invokeMethod('unsubscribe', {'clientName': clientName});
   }
 
   /// Get the UUID configured for PubNub. Note that when the UUID is passed  in the plugin creation, the returned UUID is the same
   /// If the UUID has not been passed in the plugin creation, then PubNub assigns a new UUID. This may be important for tracking how many devices/clients are using the API and
   /// may impact how much the service costs
-  Future<String> uuid() async {
-    return await _channel.invokeMethod('uuid');
+  Future<String> uuid(String clientName) async {
+    return await _channel.invokeMethod('uuid', {'clientName': clientName});
   }
 
   /// Fires whenever the a message is received.

@@ -2,8 +2,7 @@
 
 @interface PubnubFlutterPlugin ()<PNObjectEventListener>
 
-@property (nonatomic, strong) PubNub* client;
-@property (nonatomic, strong) PNConfiguration *config;
+@property (nonatomic, strong) NSMutableDictionary<NSString*, PubNub*> *clients;
 @end
 
 @implementation PubnubFlutterPlugin
@@ -13,6 +12,8 @@ NSString *const PUBNUB_MESSAGE_CHANNEL_NAME = @"flutter.ingenio.com/pubnub_messa
 NSString *const PUBNUB_STATUS_CHANNEL_NAME = @"flutter.ingenio.com/pubnub_status";
 NSString *const PUBNUB_PRESENCE_CHANNEL_NAME = @"flutter.ingenio.com/pubnub_presence";
 NSString *const PUBNUB_ERROR_CHANNEL_NAME = @"flutter.ingenio.com/pubnub_error";
+
+NSString *const CLIENT_NAME_KEY = @"clientName";
 
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
     FlutterMethodChannel* channel = [FlutterMethodChannel
@@ -51,6 +52,7 @@ NSString *const PUBNUB_ERROR_CHANNEL_NAME = @"flutter.ingenio.com/pubnub_error";
     [FlutterEventChannel eventChannelWithName:PUBNUB_ERROR_CHANNEL_NAME
                               binaryMessenger:[registrar messenger]];
     [errorChannel setStreamHandler:instance.errorStreamHandler];
+    
 }
 
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
@@ -73,31 +75,46 @@ NSString *const PUBNUB_ERROR_CHANNEL_NAME = @"flutter.ingenio.com/pubnub_error";
 
 - (id) handleUnsubscribe:(FlutterMethodCall*)call {
     NSString *channel = call.arguments[@"channel"];
+    NSString *clientName = call.arguments[CLIENT_NAME_KEY];
     
-    if(channel) {
-        [self.client unsubscribeFromChannels:@[channel] withPresence:NO];
-    } else {
-        [self.client unsubscribeFromAll];
+    if(clientName && self.clients[clientName]) {
+        PubNub *client = self.clients[clientName];
+        
+        if(channel) {
+            [client unsubscribeFromChannels:@[channel] withPresence:NO];
+        } else {
+            [client unsubscribeFromAll];
+        }
     }
     
     return NULL;
 }
 
 - (id) handleUUID:(FlutterMethodCall*)call {
+    NSString *clientName = call.arguments[CLIENT_NAME_KEY];
     
-    return self.config.uuid;
+    if(clientName && self.clients[clientName]) {
+        NSLog(@"HANDLE UUID: %@", clientName);
+        PubNub *client = self.clients[clientName];
+        return [[client currentConfiguration] uuid];
+    }
+    
+    return NULL;
 }
 
 - (id) handlePublish:(FlutterMethodCall*)call {
     NSString *channel = call.arguments[@"channel"];
     NSDictionary *message = call.arguments[@"message"];
     NSDictionary *metadata = call.arguments[@"metadata"];
-
-    if(channel && message) {
+    NSString *clientName = call.arguments[CLIENT_NAME_KEY];
+    
+    if(channel && message && clientName && self.clients[clientName]) {
+        PubNub *client = self.clients[clientName];
+            
          __weak __typeof(self) weakSelf = self;
-        [weakSelf.client publish:message toChannel:channel withMetadata:metadata completion:^(PNPublishStatus *status) {
+        [client publish:message toChannel:channel withMetadata:metadata completion:^(PNPublishStatus *status) {
             __strong __typeof(self) strongSelf = weakSelf;
-            [strongSelf handleStatus:status client:strongSelf.client];
+            [strongSelf handleStatus:status client:client];
         }];
     }
     
@@ -105,52 +122,73 @@ NSString *const PUBNUB_ERROR_CHANNEL_NAME = @"flutter.ingenio.com/pubnub_error";
 }
 
 - (id) handleCreate:(FlutterMethodCall*)call {
-    NSString *publishKey = call.arguments[@"publishKey"];
-    NSString *subscribeKey = call.arguments[@"subscribeKey"];
-    NSString *uuid = call.arguments[@"uuid"];
-    NSString *filter = call.arguments[@"filter"];
-    NSString *authKey = call.arguments[@"authKey"];
-    NSNumber *presenceTimeout = call.arguments[@"presenceTimeout"];
     
-    if(publishKey && subscribeKey) {
-        NSLog(@"Arguments: %@, %@", publishKey, subscribeKey);
-       
-        self.config =
-        [PNConfiguration configurationWithPublishKey:publishKey
-                                        subscribeKey:subscribeKey];
-        self.config.stripMobilePayload = NO;
-        if(uuid) {
-            self.config.uuid = uuid;
-        }
+    if(self.clients == NULL) {
+        self.clients = [NSMutableDictionary new];
+    }
+    
+    NSArray *clientList = call.arguments[@"clients"];
+    
+    for(NSDictionary *client in clientList) {
+        NSString *clientName = [client valueForKey:CLIENT_NAME_KEY];
         
-        if(authKey) {
-            self.config.authKey = authKey;
-        }
+        NSLog(@"CLIENT NAME: %@", clientName);
         
-        if(presenceTimeout) {
-            self.config.presenceHeartbeatValue = [presenceTimeout integerValue];
+        if (![self.clients valueForKey:clientName]) {
+            NSString *publishKey = client[@"publishKey"];
+            NSString *subscribeKey = client[@"subscribeKey"];
+            NSString *uuid = client[@"uuid"];
+            NSString *filter = client[@"filter"];
+            NSString *authKey = client[@"authKey"];
+            NSNumber *presenceTimeout = client[@"presenceTimeout"];
+            
+            if(publishKey && subscribeKey) {
+                NSLog(@"Create client - Arguments: %@, %@, %@", publishKey, subscribeKey, clientName);
+                
+                PNConfiguration *config =
+                [PNConfiguration configurationWithPublishKey:publishKey
+                                                subscribeKey:subscribeKey];
+                config.stripMobilePayload = NO;
+                if(uuid) {
+                    config.uuid = uuid;
+                }
+                
+                if(authKey) {
+                    config.authKey = authKey;
+                }
+                
+                if(presenceTimeout) {
+                    config.presenceHeartbeatValue = [presenceTimeout integerValue];
+                }
+                
+                PubNub *client = [PubNub clientWithConfiguration:config];
+                
+                if(filter) {
+                    client.filterExpression = filter;
+                }
+                
+                self.clients[clientName] = client;
+                
+                [client addListener:self];
+            }
         }
- 
-        self.client = [PubNub clientWithConfiguration:self.config];
-        
-        if(filter) {
-            self.client.filterExpression = filter;
-        }
-        
-        [self.client addListener:self];
     }
     
     return NULL;
 }
 
 - (id) handleSubscribe:(FlutterMethodCall*)call {
-
     NSArray *channels = call.arguments[@"channels"];
+    NSString *clientName = call.arguments[CLIENT_NAME_KEY];
     
-    if(channels) {
-        NSLog(@"Arguments: %@", channels);
+    if(clientName && self.clients[clientName]) {
+        PubNub *client = self.clients[clientName];
         
-        [self.client subscribeToChannels:channels withPresence:YES];
+        if(channels) {
+            NSLog(@"Arguments: %@", channels);
+        
+            [client subscribeToChannels:channels withPresence:YES];
+        }
     }
     
     return NULL;
@@ -184,9 +222,6 @@ NSString *const PUBNUB_ERROR_CHANNEL_NAME = @"flutter.ingenio.com/pubnub_error";
         
         // Message has been received on channel stored in message.data.channel.
     }
-    
-    NSLog(@"Received message: %@ on channel %@ uuid: %@ at %@", message.data.message[@"msg"],
-          message.data.channel, message.uuid, message.data.timetoken);
     
     [self.messageStreamHandler sendMessage:message];
 }
