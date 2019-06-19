@@ -10,7 +10,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="55929d34-4c8c-4e4e-a974-92017b41027b" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/example/pubnubflutter/PubnubFlutterPlugin.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/com/example/pubnubflutter/PubnubFlutterPlugin.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/ios/.symlinks/plugins/pubnub_flutter/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/pubnub_flutter/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/ios/.symlinks/plugins/pubnub_flutter/ios/Classes/PubnubFlutterPlugin.m" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/pubnub_flutter/ios/Classes/PubnubFlutterPlugin.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ios/Classes/PubnubFlutterPlugin.m" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Classes/PubnubFlutterPlugin.m" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.dart_tool/" />
     <ignored path="$PROJECT_DIR$/.idea/" />
@@ -86,8 +89,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/example/lib/main.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-317">
-              <caret line="42" column="56" lean-forward="true" selection-start-line="35" selection-start-column="4" selection-end-line="42" selection-end-column="56" />
+            <state relative-caret-position="287">
+              <caret line="35" column="35" selection-start-line="35" selection-start-column="27" selection-end-line="35" selection-end-column="35" />
               <folding>
                 <element signature="e#0#39#0" expanded="true" />
               </folding>
@@ -103,6 +106,7 @@
       <find>sendMessage</find>
       <find>handleUUID</find>
       <find>onStatusReceived</find>
+      <find>received</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -120,10 +124,10 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="336" />
-    <option name="y" value="88" />
-    <option name="width" value="1340" />
-    <option name="height" value="855" />
+    <option name="x" value="19" />
+    <option name="y" value="23" />
+    <option name="width" value="1501" />
+    <option name="height" value="910" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -239,10 +243,9 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="151" y="23" width="1340" height="865" extended-state="0" />
-    <editor active="true" />
+    <frame x="19" y="23" width="1501" height="910" extended-state="0" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.34052387" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.19122687" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Designer" order="2" />
       <window_info id="Build Variants" order="3" side_tool="true" />
@@ -253,7 +256,7 @@
       <window_info id="Resources Explorer" order="8" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.54406893" weight="0.6157827" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.54406893" visible="true" weight="0.45476773" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.3988827" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -264,7 +267,7 @@
       <window_info anchor="bottom" id="Logcat" order="10" weight="0.46836734" />
       <window_info anchor="bottom" id="Terminal" order="11" />
       <window_info anchor="bottom" id="Android Profiler" order="12" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Messages" order="13" weight="0.5346939" />
+      <window_info anchor="bottom" id="Messages" order="13" weight="0.41075796" />
       <window_info anchor="bottom" id="Flutter Performance" order="14" side_tool="true" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -274,7 +277,7 @@
       <window_info anchor="right" id="Flutter Outline" order="5" />
       <window_info anchor="right" id="Device File Explorer" order="6" sideWeight="0.50256413" side_tool="true" weight="0.23595506" />
       <window_info anchor="right" id="Theme Preview" order="7" />
-      <window_info anchor="right" id="Flutter Inspector" order="8" sideWeight="0.4974359" visible="true" weight="0.033898305" />
+      <window_info anchor="right" id="Flutter Inspector" order="8" sideWeight="0.4974359" visible="true" weight="0.030843044" />
       <window_info anchor="right" x="0" y="0" width="370" height="790" id="Documentation" order="9" side_tool="true" weight="0.32967034" />
     </layout>
   </component>
@@ -380,8 +383,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/example/lib/main.dart">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-317">
-          <caret line="42" column="56" lean-forward="true" selection-start-line="35" selection-start-column="4" selection-end-line="42" selection-end-column="56" />
+        <state relative-caret-position="287">
+          <caret line="35" column="35" selection-start-line="35" selection-start-column="27" selection-end-line="35" selection-end-column="35" />
           <folding>
             <element signature="e#0#39#0" expanded="true" />
           </folding>
