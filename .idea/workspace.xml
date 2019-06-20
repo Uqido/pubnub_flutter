@@ -24,11 +24,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lib/pubnub_flutter.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="476">
-              <caret line="41" column="3" lean-forward="true" selection-start-line="41" selection-start-column="3" selection-end-line="41" selection-end-column="3" />
+            <state relative-caret-position="372">
+              <caret line="224" column="73" selection-start-line="224" selection-start-column="73" selection-end-line="224" selection-end-column="73" />
               <folding>
                 <element signature="e#0#20#0" expanded="true" />
               </folding>
@@ -76,14 +76,16 @@
       </file>
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pubspec.yaml">
-          <provider selected="true" editor-type-id="text-editor" />
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-24" />
+          </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/example/lib/main.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="270">
-              <caret line="18" column="23" selection-start-line="18" selection-start-column="8" selection-end-line="18" selection-end-column="23" />
+            <state relative-caret-position="62">
+              <caret line="20" lean-forward="true" selection-start-line="20" selection-end-line="20" />
               <folding>
                 <element signature="e#0#39#0" expanded="true" />
               </folding>
@@ -125,9 +127,8 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="AndroidView" />
-      <pane id="PackagesPane" />
       <pane id="Scope" />
+      <pane id="AndroidView" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -161,13 +162,6 @@
               <item name="pubnub_flutter" type="b2602c69:ProjectViewProjectNode" />
               <item name="pubnub_flutter" type="462c0819:PsiDirectoryNode" />
               <item name="example" type="462c0819:PsiDirectoryNode" />
-              <item name="android" type="462c0819:PsiDirectoryNode" />
-              <item name="app" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="pubnub_flutter" type="b2602c69:ProjectViewProjectNode" />
-              <item name="pubnub_flutter" type="462c0819:PsiDirectoryNode" />
-              <item name="example" type="462c0819:PsiDirectoryNode" />
               <item name="lib" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -184,6 +178,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -240,10 +235,10 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="0" width="1680" height="1050" extended-state="6" />
+    <frame x="19" y="23" width="1501" height="910" extended-state="1" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.27045178" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.19122687" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Designer" order="2" />
       <window_info id="Build Variants" order="3" side_tool="true" />
@@ -275,7 +270,7 @@
       <window_info anchor="right" id="Flutter Outline" order="5" />
       <window_info anchor="right" id="Device File Explorer" order="6" sideWeight="0.50256413" side_tool="true" weight="0.23595506" />
       <window_info anchor="right" id="Theme Preview" order="7" />
-      <window_info anchor="right" id="Flutter Inspector" order="8" sideWeight="0.4974359" visible="true" weight="0.026862027" />
+      <window_info anchor="right" id="Flutter Inspector" order="8" sideWeight="0.4974359" visible="true" weight="0.030843044" />
       <window_info anchor="right" x="0" y="0" width="370" height="790" id="Documentation" order="9" side_tool="true" weight="0.32967034" />
     </layout>
   </component>
@@ -376,12 +371,14 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/pubspec.yaml">
-      <provider selected="true" editor-type-id="text-editor" />
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-24" />
+      </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/example/lib/main.dart">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="270">
-          <caret line="18" column="23" selection-start-line="18" selection-start-column="8" selection-end-line="18" selection-end-column="23" />
+        <state relative-caret-position="62">
+          <caret line="20" lean-forward="true" selection-start-line="20" selection-end-line="20" />
           <folding>
             <element signature="e#0#39#0" expanded="true" />
           </folding>
@@ -390,8 +387,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/lib/pubnub_flutter.dart">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="476">
-          <caret line="41" column="3" lean-forward="true" selection-start-line="41" selection-start-column="3" selection-end-line="41" selection-end-column="3" />
+        <state relative-caret-position="372">
+          <caret line="224" column="73" selection-start-line="224" selection-start-column="73" selection-end-line="224" selection-end-column="73" />
           <folding>
             <element signature="e#0#20#0" expanded="true" />
           </folding>
