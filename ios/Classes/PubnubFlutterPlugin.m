@@ -62,6 +62,8 @@ NSString *const CLIENT_NAME_KEY = @"clientName";
         result([self handleSubscribe:call]);
     } else if  ([@"publish" isEqualToString:call.method]) {
         result([self handlePublish:call]);
+    } else if  ([@"presence" isEqualToString:call.method]) {
+        result([self handlePresence:call]);
     } else if  ([@"unsubscribe" isEqualToString:call.method]) {
         result([self handleUnsubscribe:call]);
     } else if  ([@"unsubscribe_all" isEqualToString:call.method]) {
@@ -177,18 +179,41 @@ NSString *const CLIENT_NAME_KEY = @"clientName";
     return NULL;
 }
 
-- (id) handleSubscribe:(FlutterMethodCall*)call {
-    NSArray *channels = call.arguments[@"channels"];
+- (id) handlePresence:(FlutterMethodCall*)call {
+    NSString *channel = call.arguments[@"channel"];
     NSString *clientName = call.arguments[CLIENT_NAME_KEY];
+    NSDictionary<NSString*, NSString*> *state = call.arguments[@"state"];
     
-    if(clientName && self.clients[clientName]) {
+    if(channel && state && state.count > 0 && clientName && self.clients[clientName]) {
         PubNub *client = self.clients[clientName];
         
-        if(channels) {
-            NSLog(@"Arguments: %@", channels);
+        NSLog(@"Set Presence: %@", state);
         
-            [client subscribeToChannels:channels withPresence:YES];
-        }
+        [client setState: state forUUID:client.uuid onChannel: channel
+               withCompletion:^(PNClientStateUpdateStatus *status) {
+                   
+                   if (status.isError) {
+                       NSDictionary *result = @{@"operation":  [PubnubFlutterPlugin getOperationAsNumber:status.operation], @"error": @""};
+                       [self.errorStreamHandler sendError:result];
+                   }
+                   else {
+                      [self.statusStreamHandler sendStatus:status];
+                   }
+               }];
+    }
+    
+    return NULL;
+}
+- (id) handleSubscribe:(FlutterMethodCall*)call {
+    NSArray<NSString *> *channels = call.arguments[@"channels"];
+    NSString *clientName = call.arguments[CLIENT_NAME_KEY];
+    
+    if(channels && channels.count > 0 && clientName && self.clients[clientName]) {
+        PubNub *client = self.clients[clientName];
+        
+        NSLog(@"Arguments: %@", channels);
+        
+        [client subscribeToChannels:channels withPresence:YES];
     }
     
     return NULL;
@@ -196,7 +221,6 @@ NSString *const CLIENT_NAME_KEY = @"clientName";
 
 - (void)handleStatus:(PNStatus *)status client:(PubNub*)client {
     if (status.isError) {
-        [self.errorStreamHandler sendError:@{@"type":@"state", @"category":  [PubnubFlutterPlugin getCategoryAsNumber:status.category]}];
         NSDictionary *result = @{@"operation":  [PubnubFlutterPlugin getOperationAsNumber:status.operation], @"error": @""};
         [self.errorStreamHandler sendError:result];
         

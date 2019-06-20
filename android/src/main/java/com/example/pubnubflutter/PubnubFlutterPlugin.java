@@ -20,10 +20,11 @@ import com.pubnub.api.enums.PNOperationType;
 import com.pubnub.api.enums.PNStatusCategory;
 import com.pubnub.api.models.consumer.PNPublishResult;
 import com.pubnub.api.models.consumer.PNStatus;
+import com.pubnub.api.models.consumer.presence.PNSetStateResult;
 import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
 import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -129,6 +130,13 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
                     result.error("ERROR", "Cannot Unsubscribe.", null);
                 }
                 break;
+            case "presence":
+                if (handlePresence(call)) {
+                    result.success(true);
+                } else {
+                    result.error("ERROR", "Cannot set presence.", null);
+                }
+                break;
             case "uuid":
                 String uuid = handleUuid(call);
 
@@ -144,12 +152,31 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
         }
     }
 
+    private boolean handlePresence(MethodCall call) {
+        Map<String, String> state = call.argument("state");
+        String channel = call.argument("channel");
+        String clientName = call.argument(CLIENT_NAME_KEY);
+
+        if(state != null && !state.isEmpty() && clientName != null && clients.get(clientName) != null && channel != null) {
+            System.out.println("SET PRESENCE STATE");
+            clients.get(clientName).setPresenceState().channels(Arrays.asList(channel)).state(state).async(new PNCallback<PNSetStateResult>() {
+                @Override
+                public void onResponse(final PNSetStateResult result, PNStatus status) {
+                    handleStatus(status);
+                }
+            });
+        }
+
+        return true;
+    }
+
+
     // PubNubFlutter({'clients':[{'clientName':'client1','pubKey':'xxx','subKey': 'rrrr', 'authKey':'wwwww', 'presenceTimeout':20, 'uuid':'ytttttt', 'filter':'vddsfdsfds'},
     ////                 'client2':{'subKey': 'ttttt', 'authKey':'fffff'}});
     private boolean handleCreate(MethodCall call) {
         System.out.println("PubnubFlutterPlugin handleCreate");
 
-        List<HashMap> clientList = call.argument("clients");
+        List<Map> clientList = call.argument("clients");
 
         System.out.println("IN HANDLE CREATE: ");
 
@@ -246,9 +273,8 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
 
         if(clientName != null && clients.get(clientName) != null) {
             if (channel != null) {
-                List<String> channels = new ArrayList<>();
-                channels.add(channel);
-                clients.get(clientName).unsubscribe().channels(channels).execute();
+
+                clients.get(clientName).unsubscribe().channels(Arrays.asList(channel)).execute();
 
                 return true;
             } else {

@@ -190,6 +190,14 @@ class PubNubFlutter {
     return;
   }
 
+  /// Set Presence State on a specified channel
+  Future<void> presence(
+      String clientName, String channel, Map<String, String> state) async {
+    Map args = {'clientName': clientName, 'state': state, 'channel': channel};
+
+    return await _channel.invokeMethod('presence', args);
+  }
+
   /// Publishes a message on a specified channel, some metadata can be passed and used in conjunction with filter expressions
   Future<void> publish(String clientName, Map message, String channel,
       {Map metadata}) async {
