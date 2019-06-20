@@ -10,6 +10,7 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.pubnub.api.PNConfiguration;
 import com.pubnub.api.PubNub;
@@ -455,14 +456,6 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
 
         void sendPresence(PNPresenceEventResult presence) {
             System.out.println(presence.toString());
-            JsonElement state = presence.getState();
-            if (state != null) {
-                System.out.println("presence state: " + state.toString());
-            }
-            Object userMetadata = presence.getUserMetadata();
-            if (userMetadata != null) {
-                System.out.println("presence meta data: " + userMetadata.toString());
-            }
             if (super.sink != null) {
                 // Send message
                 final Map<String, Object> map = new HashMap<>();
@@ -470,6 +463,8 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
                 map.put("event", presence.getEvent());
                 map.put("uuid", presence.getUuid());
                 map.put("occupancy", presence.getOccupancy());
+                JsonElement state = presence.getState();
+                map.put("state", new Gson().fromJson(state, Map.class));
                 executor.execute(new Runnable() {
                     @Override
                     public void run() {
