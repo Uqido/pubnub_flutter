@@ -439,8 +439,8 @@ NSString *const CLIENT_NAME_KEY = @"clientName";
 
 - (void) sendPresence:(PNPresenceEventResult *)presence {
     if(self.eventSink) {
-        
-        self.eventSink(@{@"channel": presence.data.channel, @"event": presence.data.presenceEvent, @"uuid": presence.data.presence.uuid, @"occupancy": presence.data.presence.occupancy, @"state": presence.data.presence.state});
+        NSLog(@"Presence state: %@", presence.data.presence.state);
+        self.eventSink(@{@"channel": presence.data.channel, @"event": presence.data.presenceEvent, @"uuid": presence.data.presence.uuid, @"occupancy": presence.data.presence.occupancy, @"state": presence.data.presence.state == NULL ? [NSDictionary new] : presence.data.presence.state});
     }
 }
 

@@ -93,6 +93,10 @@ class _MyAppState extends State<MyApp> {
                         'Yegor-Channel',
                       );
 
+                      _pubNubFlutter.presence("client1", "Olivier-Channel", {
+                        "clientType": "advisorSession",
+                        "username": "BernieSuperTrump"
+                      });
                       // Below is used to filter the uuid, works in combination with the filter expression in the create method above
                       //metadata: {
                       //  'uuid': '127c1ab5-fc7f-4c46-8460-3207b6782007'

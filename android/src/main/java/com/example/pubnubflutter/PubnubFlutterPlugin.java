@@ -490,7 +490,7 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
                 map.put("uuid", presence.getUuid());
                 map.put("occupancy", presence.getOccupancy());
                 JsonElement state = presence.getState();
-                map.put("state", new Gson().fromJson(state, Map.class));
+                map.put("state", state == null ? new HashMap<String,String>() : new Gson().fromJson(state, Map.class));
                 executor.execute(new Runnable() {
                     @Override
                     public void run() {
