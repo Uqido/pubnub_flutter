@@ -220,6 +220,11 @@ class PubNubFlutter {
         'unsubscribe', {'clientName': clientName, 'channel': channel});
   }
 
+  /// Dispose/destroy pubnub clients
+  Future<void> dispose() async {
+    return await _channel.invokeMethod('dispose');
+  }
+
   /// Unsubscribes from all channels
   Future<void> unsubscribeAll(String clientName) async {
     return await _channel

@@ -58,6 +58,8 @@ NSString *const CLIENT_NAME_KEY = @"clientName";
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
     if  ([@"create" isEqualToString:call.method]) {
         result([self handleCreate:call]);
+    } else if  ([@"dispose" isEqualToString:call.method]) {
+        result([self handleDispose:call]);
     } else if  ([@"subscribe" isEqualToString:call.method]) {
         result([self handleSubscribe:call]);
     } else if  ([@"publish" isEqualToString:call.method]) {
@@ -88,6 +90,17 @@ NSString *const CLIENT_NAME_KEY = @"clientName";
             [client unsubscribeFromAll];
         }
     }
+    
+    return NULL;
+}
+
+- (id) handleDispose:(FlutterMethodCall*)call {
+    
+    for(PubNub *client in [self.clients allValues]) {
+        [client unsubscribeFromAll];
+    }
+
+    [self.clients removeAllObjects];
     
     return NULL;
 }

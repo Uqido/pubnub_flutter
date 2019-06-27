@@ -109,6 +109,13 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
                     result.error("ERROR", "Wrong PubNub Credentials.", null);
                 }
                 break;
+            case "dispose":
+                if (handleDispose(call)) {
+                    result.success(true);
+                } else {
+                    result.error("ERROR", "Cannot dispose.", null);
+                }
+                break;
             case "subscribe":
                 if (handleSubscribe(call)) {
                     result.success(true);
@@ -170,6 +177,17 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
         return true;
     }
 
+    private boolean handleDispose(MethodCall call) {
+        for(PubNub client : clients.values()) {
+            client.unsubscribeAll();
+            client.disconnect();
+            client.destroy();
+        }
+
+        clients.clear();
+
+        return true;
+    }
 
     // PubNubFlutter({'clients':[{'clientName':'client1','pubKey':'xxx','subKey': 'rrrr', 'authKey':'wwwww', 'presenceTimeout':20, 'uuid':'ytttttt', 'filter':'vddsfdsfds'},
     ////                 'client2':{'subKey': 'ttttt', 'authKey':'fffff'}});
