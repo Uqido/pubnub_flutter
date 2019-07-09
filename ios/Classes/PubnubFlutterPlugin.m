@@ -388,9 +388,9 @@ NSString *const CLIENT_NAME_KEY = @"clientName";
             return [NSNumber numberWithInt:18];
         case PNTimeOperation:
             return [NSNumber numberWithInt:19];
+        default:
+            return [NSNumber numberWithInt:0];
     }
-    
-    return [NSNumber numberWithInt:0];
 }
 @end
 
