@@ -483,7 +483,8 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
                 // Send message
                 final Map<String, Object> map = new HashMap<>();
                 map.put("category", PubnubFlutterPlugin.getCategoryAsNumber(status.getCategory()));
-                map.put("operation", PubnubFlutterPlugin.getOperationAsNumber(status.getOperation()));
+                PNOperationType operationType = status.getOperation();
+                map.put("operation", operationType == null ? null : PubnubFlutterPlugin.getOperationAsNumber(status.getOperation()));
                 map.put("uuid", status.getUuid());
                 map.put("channels", status.getAffectedChannels());
 
