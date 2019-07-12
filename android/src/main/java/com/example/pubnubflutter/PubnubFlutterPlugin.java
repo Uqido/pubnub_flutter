@@ -216,7 +216,7 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
                     System.out.println("CREATE CLIENT: " + clientName);
 
                     config = new PNConfiguration();
-                    config.setReconnectionPolicy(PNReconnectionPolicy.EXPONENTIAL);
+                    config.setReconnectionPolicy(PNReconnectionPolicy.LINEAR);
                     config.setPublishKey(publishKey.toString());
                     config.setSubscribeKey(subscribeKey.toString());
 
@@ -240,7 +240,7 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
                     clients.get(clientName).addListener(new SubscribeCallback() {
                         @Override
                         public void status(PubNub pubnub, PNStatus status) {
-                            System.out.println("IN STATUS");
+                            System.out.println("IN STATUS:" + status.toString());
                             statusStreamHandler.sendStatus(status);
                         }
 
