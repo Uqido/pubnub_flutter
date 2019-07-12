@@ -363,7 +363,7 @@ NSString *const CLIENT_NAME_KEY = @"clientName";
         case PNSetStateOperation:
             return [NSNumber numberWithInt:9];
         case PNGetStateOperation:
-            return [NSNumber numberWithInt:21];
+            return [NSNumber numberWithInt:20];
         case PNStateForChannelOperation:
             return [NSNumber numberWithInt:0];
         case PNStateForChannelGroupOperation:

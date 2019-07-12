@@ -348,4 +348,5 @@ enum PNOperationType {
   PNRemovePushNotificationsFromChannelsOperation,
   PNRemoveAllPushNotificationsOperation,
   PNTimeOperation,
+  PNGetStateOperation
 }

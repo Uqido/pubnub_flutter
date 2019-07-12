@@ -427,14 +427,14 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
             case PNHereNowOperation:
                 return 0;
             case PNGetState:
-                return 0;
+                return 20;
             case PNAccessManagerAudit:
                 return 0;
             case PNAccessManagerGrant:
                 return 0;
+            default:
+                return 0;
         }
-
-        return 0;
     }
 
     public abstract static class BaseStreamHandler implements EventChannel.StreamHandler {
