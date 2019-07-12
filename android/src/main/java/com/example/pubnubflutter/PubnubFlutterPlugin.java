@@ -17,6 +17,7 @@ import com.pubnub.api.PubNub;
 import com.pubnub.api.callbacks.PNCallback;
 import com.pubnub.api.callbacks.SubscribeCallback;
 import com.pubnub.api.enums.PNOperationType;
+import com.pubnub.api.enums.PNReconnectionPolicy;
 import com.pubnub.api.enums.PNStatusCategory;
 import com.pubnub.api.models.consumer.PNPublishResult;
 import com.pubnub.api.models.consumer.PNStatus;
@@ -215,6 +216,7 @@ public class PubnubFlutterPlugin implements MethodCallHandler {
                     System.out.println("CREATE CLIENT: " + clientName);
 
                     config = new PNConfiguration();
+                    config.setReconnectionPolicy(PNReconnectionPolicy.EXPONENTIAL);
                     config.setPublishKey(publishKey.toString());
                     config.setSubscribeKey(subscribeKey.toString());
 
