@@ -280,9 +280,9 @@ class PubNubFlutter {
 
   /// Fires whenever a status is received.
   Map _parseStatus(Map status) {
-    int category = status['category'];
+    int category = status['category'] ?? 0;
     status['category'] = PNStatusCategory.values[category];
-    int operation = status['operation'];
+    int operation = status['operation'] ?? 0;
     status['operation'] = PNOperationType.values[operation];
     return status;
   }
@@ -294,7 +294,7 @@ class PubNubFlutter {
 
   /// Fires whenever a PubNub error is received
   Map _parseError(Map error) {
-    int operation = error['operation'];
+    int operation = error['operation'] ?? 0;
     error['operation'] = PNOperationType.values[operation];
     return error;
   }
