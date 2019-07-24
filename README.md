@@ -26,8 +26,7 @@ To use this plugin, add `pubnub_flutter` as a [dependency in your pubspec.yaml f
 // Instantiate plugin with a filter expression:
 _pubNubFlutter = PubNubFlutter([PubNubConfig('client1', 'pub-c-xxxx',
           'sub-cxxxx',
-          presenceTimeout: 120),]'pub-c-2d1121f9-06c1-4413-8d2e-0000000000',
-        'sub-c-324ae474-ecfd-11e8-91a4-00000000000',
+          presenceTimeout: 120,
         uuid: '127c1ab5-fc7f-4c46-8460-3207b6782007',
         filter: 'uuid != "127c1ab5-fc7f-4c46-8460-3207b6782007"']);
 
