@@ -23,11 +23,11 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     _pubNubFlutter = PubNubFlutter([
-      PubNubConfig('client1', 'pub-c-5089170e-d981-4b05-9fe0-8118cb3ae389',
-          'sub-c-3e109ccc-e640-11e8-a679-1679df73129d',
+      PubNubConfig('client1', 'pub-c-xxxx',
+          'sub-cxxxx',
           presenceTimeout: 120),
-      PubNubConfig('client2', 'pub-c-5089170e-d981-4b05-9fe0-8118cb3ae389',
-          'sub-c-3e109ccc-e640-11e8-a679-1679df73129d'),
+      PubNubConfig('client2', 'pub-c-xxxx',
+          'sub-cxxx'),
     ]);
 
     _pubNubFlutter.uuid('client1').then((uuid) => print('UUID1: $uuid'));
