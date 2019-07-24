@@ -40,7 +40,7 @@ _pubNubFlutter.unsubscribe('client1',channel: 'test_channel');
 _pubNubFlutter.unsubscribeAll('client1');
 
 // Publish a message to a channel:
-_pubNubFlutter.publish(
+_pubNubFlutter.publish('client1',
     {'message': 'Hello World'},
     'test_channel',
 );
