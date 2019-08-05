@@ -210,7 +210,7 @@ NSString *const CLIENT_NAME_KEY = @"clientName";
                        [self.errorStreamHandler sendError:result];
                    }
                    else {
-                      [self.statusStreamHandler sendStatus:status];
+                       [self.statusStreamHandler sendStatus:status channel:channel];
                    }
                }];
     }
@@ -232,20 +232,27 @@ NSString *const CLIENT_NAME_KEY = @"clientName";
     return NULL;
 }
 
-- (void)handleStatus:(PNStatus *)status client:(PubNub*)client {
+- (void)handleStatus:(PNPublishStatus *)status client:(PubNub*)client {
     if (status.isError) {
         NSDictionary *result = @{@"operation":  [PubnubFlutterPlugin getOperationAsNumber:status.operation], @"error": @""};
         [self.errorStreamHandler sendError:result];
         
     } else {
-         [self.statusStreamHandler sendStatus:status];
+        [self.statusStreamHandler sendStatus:status channel: NULL] ;
     }
 }
 
 #pragma mark - Pubnub delegate methods
 
 - (void)client:(PubNub *)client didReceiveStatus:(PNStatus *)status {
-    [self.statusStreamHandler sendStatus:status];
+    NSString *affectedChannel;
+    
+    if (status.category == PNConnectedCategory || status.category == PNReconnectedCategory) {
+        PNSubscribeStatus *subscribeStatus = (PNSubscribeStatus *)status;
+        affectedChannel = [[subscribeStatus data] channel];
+    }
+    
+    [self.statusStreamHandler sendStatus:status channel:affectedChannel];
 }
 
 - (void)client:(PubNub *)client didReceiveMessage:(PNMessageResult *)message {
@@ -429,10 +436,9 @@ NSString *const CLIENT_NAME_KEY = @"clientName";
     return nil;
 }
 
-- (void) sendStatus:(PNStatus *)status {
+- (void) sendStatus:(PNStatus *)status channel:(NSString *)channel{
     if(self.eventSink) {
-        
-        self.eventSink(@{@"category": [PubnubFlutterPlugin getCategoryAsNumber:status.category],@"operation": [PubnubFlutterPlugin getOperationAsNumber:status.operation], @"uuid": status.uuid});
+        self.eventSink(@{@"category": [PubnubFlutterPlugin getCategoryAsNumber:status.category],@"operation": [PubnubFlutterPlugin getOperationAsNumber:status.operation], @"uuid": status.uuid, @"channels": channel == NULL ? @[] : @[channel]});
     }
 }
 
