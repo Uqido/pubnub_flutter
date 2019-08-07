@@ -210,7 +210,7 @@ NSString *const CLIENT_NAME_KEY = @"clientName";
                        [self.errorStreamHandler sendError:result];
                    }
                    else {
-                       [self.statusStreamHandler sendStatus:status channel:channel];
+                       [self.statusStreamHandler sendStatus:status];
                    }
                }];
     }
@@ -238,21 +238,14 @@ NSString *const CLIENT_NAME_KEY = @"clientName";
         [self.errorStreamHandler sendError:result];
         
     } else {
-        [self.statusStreamHandler sendStatus:status channel: NULL] ;
+        [self.statusStreamHandler sendStatus:status] ;
     }
 }
 
 #pragma mark - Pubnub delegate methods
 
 - (void)client:(PubNub *)client didReceiveStatus:(PNStatus *)status {
-    NSString *affectedChannel;
-    
-    if (status.category == PNConnectedCategory || status.category == PNReconnectedCategory) {
-        PNSubscribeStatus *subscribeStatus = (PNSubscribeStatus *)status;
-        affectedChannel = [[subscribeStatus data] channel];
-    }
-    
-    [self.statusStreamHandler sendStatus:status channel:affectedChannel];
+    [self.statusStreamHandler sendStatus:status];
 }
 
 - (void)client:(PubNub *)client didReceiveMessage:(PNMessageResult *)message {
@@ -436,9 +429,16 @@ NSString *const CLIENT_NAME_KEY = @"clientName";
     return nil;
 }
 
-- (void) sendStatus:(PNStatus *)status channel:(NSString *)channel{
+- (void) sendStatus:(PNStatus *)status {
     if(self.eventSink) {
-        self.eventSink(@{@"category": [PubnubFlutterPlugin getCategoryAsNumber:status.category],@"operation": [PubnubFlutterPlugin getOperationAsNumber:status.operation], @"uuid": status.uuid, @"channels": channel == NULL ? @[] : @[channel]});
+        
+        NSArray<NSString *> *affectedChannels;
+        if (status.category == PNConnectedCategory || status.category == PNReconnectedCategory) {
+            PNSubscribeStatus *subscribeStatus = (PNSubscribeStatus *)status;
+            affectedChannels = subscribeStatus.subscribedChannels;
+        }
+        
+        self.eventSink(@{@"category": [PubnubFlutterPlugin getCategoryAsNumber:status.category],@"operation": [PubnubFlutterPlugin getOperationAsNumber:status.operation], @"uuid": status.uuid, @"channels": affectedChannels == NULL ? @[] : affectedChannels});
     }
 }
 

@@ -23,7 +23,7 @@
 @interface StatusStreamHandler : NSObject <FlutterStreamHandler>
 @property (nonatomic, strong) FlutterEventSink eventSink;
 
-- (void) sendStatus:(PNStatus *)status channel:(NSString *)channel;
+- (void) sendStatus:(PNStatus *)status;
 
 @end
 
