@@ -1,5 +1,5 @@
 <component name="libraryTable">
-  <library name="Gradle: com.android.support:support-core-utils:26.1.0@aar" type="AndroidModuleLibraryType">
+  <library name="Gradle: com.android.support:support-core-utils:26.1.0@aar">
     <CLASSES>
       <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/87feccfa469db474a44358b1f0f8c122/jars/classes.jar!/" />
     </CLASSES>

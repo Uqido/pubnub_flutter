@@ -29,24 +29,6 @@ import 'package:flutter/services.dart';
 ///        filter: 'uuid != "127c1ab5-fc7f-4c46-8460-3207b6782007"');
 /// ```
 ///
-/// It is also possible to pass a PubNub authKey if such mechanism is used on the PubNub side for additional security.
-///
-/// ```dart
-/// _pubNubFlutter = PubNubFlutter('pub-c-2d1121f9-06c1-4413-8d2e-0000000000',
-///        'sub-c-324ae474-ecfd-11e8-91a4-00000000000',
-///        authKey: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-///        uuid: '127c1ab5-fc7f-4c46-8460-3207b6782007');
-/// ```
-///
-/// Finally, it is also possible to set a presence timeout value in order to be informed of possible/unexpected disconnections:
-///
-/// ```dart
-/// _pubNubFlutter = PubNubFlutter('pub-c-2d1121f9-06c1-4413-8d2e-0000000000',
-///        'sub-c-324ae474-ecfd-11e8-91a4-00000000000',
-///        presenceTimeOut: 120,
-///        uuid: '127c1ab5-fc7f-4c46-8460-3207b6782007');
-/// ```
-///
 /// Subscribe to a channel:
 ///
 /// ``` dart
@@ -113,45 +95,6 @@ import 'package:flutter/services.dart';
 /// ```
 ///
 ///  {@end-tool}
-///
-///
-///
-class PubNubConfig {
-  PubNubConfig(this.clientName, this.publishKey, this.subscribeKey,
-      {this.authKey, this.presenceTimeout, this.uuid, this.filter});
-
-  final String clientName;
-  final String publishKey;
-  final String subscribeKey;
-  final String authKey;
-  final int presenceTimeout;
-  final String uuid;
-  final String filter;
-
-  Map<String, dynamic> toMap() {
-    Map<String, dynamic> args = {
-      'clientName': clientName,
-      'publishKey': publishKey,
-      'subscribeKey': subscribeKey,
-    };
-
-    if (uuid != null) {
-      args['uuid'] = uuid;
-    }
-    if (filter != null) {
-      args['filter'] = filter;
-    }
-    if (authKey != null) {
-      args['authKey'] = authKey;
-    }
-    if (presenceTimeout != null && presenceTimeout > 0) {
-      args['presenceTimeout'] = presenceTimeout;
-    }
-
-    return args;
-  }
-}
-
 class PubNubFlutter {
   MethodChannel _channel;
   EventChannel _messageChannel;
@@ -165,8 +108,8 @@ class PubNubFlutter {
   Stream<Map> _onErrorReceived;
 
   /// Create the plugin, UUID and filter expressions are optional and can be used for tracking purposes and filtering purposes, for instance can disable getting messages on the same UUID.
-  PubNubFlutter(List<PubNubConfig> configList) {
-    print('PubNubFlutter constructor');
+  PubNubFlutter(String publishKey, String subscribeKey,
+      {String uuid, String filter}) {
     _channel = MethodChannel('flutter.ingenio.com/pubnub_flutter');
     _messageChannel = const EventChannel('flutter.ingenio.com/pubnub_message');
     _statusChannel = const EventChannel('flutter.ingenio.com/pubnub_status');
@@ -174,38 +117,25 @@ class PubNubFlutter {
         const EventChannel('flutter.ingenio.com/pubnub_presence');
     _errorChannel = const EventChannel('flutter.ingenio.com/pubnub_error');
 
-    List<Map<String, dynamic>> args = [];
-
-    for (PubNubConfig config in configList) {
-      args.add(config.toMap());
+    var args = {'publishKey': publishKey, 'subscribeKey': subscribeKey};
+    if (uuid != null) {
+      args['uuid'] = uuid;
     }
-
-    _channel.invokeMethod('create', {'clients': args});
+    if (filter != null) {
+      args['filter'] = filter;
+    }
+    _channel.invokeMethod('create', args);
   }
 
   /// Subscribe to a list of channels
-  Future<void> subscribe(String clientName, List<String> channels) async {
-    await _channel.invokeMethod(
-        'subscribe', {'clientName': clientName, 'channels': channels});
+  Future<void> subscribe(List<String> channels) async {
+    await _channel.invokeMethod('subscribe', {'channels': channels});
     return;
   }
 
-  /// Set Presence State on a specified channel
-  Future<void> presence(
-      String clientName, String channel, Map<String, String> state) async {
-    Map args = {'clientName': clientName, 'state': state, 'channel': channel};
-
-    return await _channel.invokeMethod('presence', args);
-  }
-
   /// Publishes a message on a specified channel, some metadata can be passed and used in conjunction with filter expressions
-  Future<void> publish(String clientName, Map message, String channel,
-      {Map metadata}) async {
-    Map args = {
-      'clientName': clientName,
-      'message': message,
-      'channel': channel
-    };
+  Future<void> publish(Map message, String channel, {Map metadata}) async {
+    Map args = {'message': message, 'channel': channel};
 
     if (metadata != null) {
       args['metadata'] = metadata;
@@ -215,27 +145,20 @@ class PubNubFlutter {
   }
 
   /// Unsubscribes from a single channel
-  Future<void> unsubscribe(String clientName, String channel) async {
-    return await _channel.invokeMethod(
-        'unsubscribe', {'clientName': clientName, 'channel': channel});
-  }
-
-  /// Dispose/destroy pubnub clients
-  Future<void> dispose() async {
-    return await _channel.invokeMethod('dispose');
+  Future<void> unsubscribe({String channel}) async {
+    return await _channel.invokeMethod('unsubscribe', {'channel': channel});
   }
 
   /// Unsubscribes from all channels
-  Future<void> unsubscribeAll(String clientName) async {
-    return await _channel
-        .invokeMethod('unsubscribe', {'clientName': clientName});
+  Future<void> unsubscribeAll() async {
+    return await _channel.invokeMethod('unsubscribe');
   }
 
   /// Get the UUID configured for PubNub. Note that when the UUID is passed  in the plugin creation, the returned UUID is the same
   /// If the UUID has not been passed in the plugin creation, then PubNub assigns a new UUID. This may be important for tracking how many devices/clients are using the API and
   /// may impact how much the service costs
-  Future<String> uuid(String clientName) async {
-    return await _channel.invokeMethod('uuid', {'clientName': clientName});
+  Future<String> uuid() async {
+    return await _channel.invokeMethod('uuid');
   }
 
   /// Fires whenever the a message is received.
@@ -280,9 +203,9 @@ class PubNubFlutter {
 
   /// Fires whenever a status is received.
   Map _parseStatus(Map status) {
-    int category = status['category'] ?? 0;
+    int category = status['category'];
     status['category'] = PNStatusCategory.values[category];
-    int operation = status['operation'] ?? 0;
+    int operation = status['operation'];
     status['operation'] = PNOperationType.values[operation];
     return status;
   }
@@ -294,7 +217,7 @@ class PubNubFlutter {
 
   /// Fires whenever a PubNub error is received
   Map _parseError(Map error) {
-    int operation = error['operation'] ?? 0;
+    int operation = error['operation'];
     error['operation'] = PNOperationType.values[operation];
     return error;
   }
@@ -348,5 +271,4 @@ enum PNOperationType {
   PNRemovePushNotificationsFromChannelsOperation,
   PNRemoveAllPushNotificationsOperation,
   PNTimeOperation,
-  PNGetStateOperation
 }

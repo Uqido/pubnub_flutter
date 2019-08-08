@@ -1,13 +1,16 @@
+#
+# To learn more about a Podspec see http://guides.cocoapods.org/syntax/podspec.html
+#
 Pod::Spec.new do |s|
   s.name             = 'pubnub_flutter'
   s.version          = '0.0.1'
-  s.summary          = 'PubNub Flutter plugin.'
+  s.summary          = 'A new flutter plugin project.'
   s.description      = <<-DESC
-The plugin allows developers to quickly integrate PubNub for iOS and Android. It allows the handling of multiple PubNub clients.
+A new flutter plugin project.
                        DESC
-  s.homepage         = 'https://github.com/Ingenio/pubnub_flutter'
+  s.homepage         = 'http://example.com'
   s.license          = { :file => '../LICENSE' }
-  s.author           = { 'Ingenio LLC' => 'obrand@ingenio.com' }
+  s.author           = { 'Your Company' => 'email@example.com' }
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.public_header_files = 'Classes/**/*.h'

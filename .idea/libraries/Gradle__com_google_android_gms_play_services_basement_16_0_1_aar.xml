@@ -1,5 +1,5 @@
 <component name="libraryTable">
-  <library name="Gradle: com.google.android.gms:play-services-basement:16.0.1@aar" type="AndroidModuleLibraryType">
+  <library name="Gradle: com.google.android.gms:play-services-basement:16.0.1@aar">
     <CLASSES>
       <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/7eae35dcd9baf73190824734d4709a9b/jars/classes.jar!/" />
     </CLASSES>

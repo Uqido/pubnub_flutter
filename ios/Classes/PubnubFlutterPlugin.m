@@ -2,7 +2,8 @@
 
 @interface PubnubFlutterPlugin ()<PNObjectEventListener>
 
-@property (nonatomic, strong) NSMutableDictionary<NSString*, PubNub*> *clients;
+@property (nonatomic, strong) PubNub* client;
+@property (nonatomic, strong) PNConfiguration *config;
 @end
 
 @implementation PubnubFlutterPlugin
@@ -12,8 +13,6 @@ NSString *const PUBNUB_MESSAGE_CHANNEL_NAME = @"flutter.ingenio.com/pubnub_messa
 NSString *const PUBNUB_STATUS_CHANNEL_NAME = @"flutter.ingenio.com/pubnub_status";
 NSString *const PUBNUB_PRESENCE_CHANNEL_NAME = @"flutter.ingenio.com/pubnub_presence";
 NSString *const PUBNUB_ERROR_CHANNEL_NAME = @"flutter.ingenio.com/pubnub_error";
-
-NSString *const CLIENT_NAME_KEY = @"clientName";
 
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
     FlutterMethodChannel* channel = [FlutterMethodChannel
@@ -52,20 +51,15 @@ NSString *const CLIENT_NAME_KEY = @"clientName";
     [FlutterEventChannel eventChannelWithName:PUBNUB_ERROR_CHANNEL_NAME
                               binaryMessenger:[registrar messenger]];
     [errorChannel setStreamHandler:instance.errorStreamHandler];
-    
 }
 
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
     if  ([@"create" isEqualToString:call.method]) {
         result([self handleCreate:call]);
-    } else if  ([@"dispose" isEqualToString:call.method]) {
-        result([self handleDispose:call]);
     } else if  ([@"subscribe" isEqualToString:call.method]) {
         result([self handleSubscribe:call]);
     } else if  ([@"publish" isEqualToString:call.method]) {
         result([self handlePublish:call]);
-    } else if  ([@"presence" isEqualToString:call.method]) {
-        result([self handlePresence:call]);
     } else if  ([@"unsubscribe" isEqualToString:call.method]) {
         result([self handleUnsubscribe:call]);
     } else if  ([@"unsubscribe_all" isEqualToString:call.method]) {
@@ -79,57 +73,31 @@ NSString *const CLIENT_NAME_KEY = @"clientName";
 
 - (id) handleUnsubscribe:(FlutterMethodCall*)call {
     NSString *channel = call.arguments[@"channel"];
-    NSString *clientName = call.arguments[CLIENT_NAME_KEY];
     
-    if(clientName && self.clients[clientName]) {
-        PubNub *client = self.clients[clientName];
-        
-        if(channel) {
-            [client unsubscribeFromChannels:@[channel] withPresence:NO];
-        } else {
-            [client unsubscribeFromAll];
-        }
+    if(channel) {
+        [self.client unsubscribeFromChannels:@[channel] withPresence:NO];
+    } else {
+        [self.client unsubscribeFromAll];
     }
-    
-    return NULL;
-}
-
-- (id) handleDispose:(FlutterMethodCall*)call {
-    
-    for(PubNub *client in [self.clients allValues]) {
-        [client unsubscribeFromAll];
-    }
-
-    [self.clients removeAllObjects];
     
     return NULL;
 }
 
 - (id) handleUUID:(FlutterMethodCall*)call {
-    NSString *clientName = call.arguments[CLIENT_NAME_KEY];
     
-    if(clientName && self.clients[clientName]) {
-        NSLog(@"HANDLE UUID: %@", clientName);
-        PubNub *client = self.clients[clientName];
-        return [[client currentConfiguration] uuid];
-    }
-    
-    return NULL;
+    return self.config.uuid;
 }
 
 - (id) handlePublish:(FlutterMethodCall*)call {
     NSString *channel = call.arguments[@"channel"];
     NSDictionary *message = call.arguments[@"message"];
     NSDictionary *metadata = call.arguments[@"metadata"];
-    NSString *clientName = call.arguments[CLIENT_NAME_KEY];
-    
-    if(channel && message && clientName && self.clients[clientName]) {
-        PubNub *client = self.clients[clientName];
-            
+
+    if(channel && message) {
          __weak __typeof(self) weakSelf = self;
-        [client publish:message toChannel:channel withMetadata:metadata completion:^(PNPublishStatus *status) {
+        [weakSelf.client publish:message toChannel:channel withMetadata:metadata completion:^(PNPublishStatus *status) {
             __strong __typeof(self) strongSelf = weakSelf;
-            [strongSelf handleStatus:status client:client];
+            [strongSelf handleStatus:status client:strongSelf.client];
         }];
     }
     
@@ -137,108 +105,55 @@ NSString *const CLIENT_NAME_KEY = @"clientName";
 }
 
 - (id) handleCreate:(FlutterMethodCall*)call {
+    NSString *publishKey = call.arguments[@"publishKey"];
+    NSString *subscribeKey = call.arguments[@"subscribeKey"];
+    NSString *uuid = call.arguments[@"uuid"];
+    NSString *filter = call.arguments[@"filter"];
     
-    if(self.clients == NULL) {
-        self.clients = [NSMutableDictionary new];
-    }
-    
-    NSArray *clientList = call.arguments[@"clients"];
-    
-    for(NSDictionary *client in clientList) {
-        NSString *clientName = [client valueForKey:CLIENT_NAME_KEY];
-        
-        NSLog(@"CLIENT NAME: %@", clientName);
-        
-        if (![self.clients valueForKey:clientName]) {
-            NSString *publishKey = client[@"publishKey"];
-            NSString *subscribeKey = client[@"subscribeKey"];
-            NSString *uuid = client[@"uuid"];
-            NSString *filter = client[@"filter"];
-            NSString *authKey = client[@"authKey"];
-            NSNumber *presenceTimeout = client[@"presenceTimeout"];
-            
-            if(publishKey && subscribeKey) {
-                NSLog(@"Create client - Arguments: %@, %@, %@", publishKey, subscribeKey, clientName);
-                
-                PNConfiguration *config =
-                [PNConfiguration configurationWithPublishKey:publishKey
-                                                subscribeKey:subscribeKey];
-                config.stripMobilePayload = NO;
-                if(uuid) {
-                    config.uuid = uuid;
-                }
-                
-                if(authKey) {
-                    config.authKey = authKey;
-                }
-                
-                if(presenceTimeout) {
-                    config.presenceHeartbeatValue = [presenceTimeout integerValue];
-                }
-                
-                PubNub *client = [PubNub clientWithConfiguration:config];
-                
-                if(filter) {
-                    client.filterExpression = filter;
-                }
-                
-                self.clients[clientName] = client;
-                
-                [client addListener:self];
-            }
+    if(publishKey && subscribeKey) {
+        NSLog(@"Arguments: %@, %@", publishKey, subscribeKey);
+       
+        self.config =
+        [PNConfiguration configurationWithPublishKey:publishKey
+                                        subscribeKey:subscribeKey];
+        self.config.stripMobilePayload = NO;
+        if(uuid) {
+            self.config.uuid = uuid;
         }
+ 
+        self.client = [PubNub clientWithConfiguration:self.config];
+        
+        if(filter) {
+            self.client.filterExpression = filter;
+        }
+        
+        [self.client addListener:self];
     }
     
     return NULL;
 }
 
-- (id) handlePresence:(FlutterMethodCall*)call {
-    NSString *channel = call.arguments[@"channel"];
-    NSString *clientName = call.arguments[CLIENT_NAME_KEY];
-    NSDictionary<NSString*, NSString*> *state = call.arguments[@"state"];
-    
-    if(channel && state && state.count > 0 && clientName && self.clients[clientName]) {
-        PubNub *client = self.clients[clientName];
-        
-        NSLog(@"Set Presence: %@", state);
-        
-        [client setState: state forUUID:client.uuid onChannel: channel
-               withCompletion:^(PNClientStateUpdateStatus *status) {
-                   
-                   if (status.isError) {
-                       NSDictionary *result = @{@"operation":  [PubnubFlutterPlugin getOperationAsNumber:status.operation], @"error": @""};
-                       [self.errorStreamHandler sendError:result];
-                   }
-                   else {
-                       [self.statusStreamHandler sendStatus:status];
-                   }
-               }];
-    }
-    
-    return NULL;
-}
 - (id) handleSubscribe:(FlutterMethodCall*)call {
-    NSArray<NSString *> *channels = call.arguments[@"channels"];
-    NSString *clientName = call.arguments[CLIENT_NAME_KEY];
+
+    NSArray *channels = call.arguments[@"channels"];
     
-    if(channels && channels.count > 0 && clientName && self.clients[clientName]) {
-        PubNub *client = self.clients[clientName];
-        
+    if(channels) {
         NSLog(@"Arguments: %@", channels);
         
-        [client subscribeToChannels:channels withPresence:YES];
+        [self.client subscribeToChannels:channels withPresence:YES];
     }
     
     return NULL;
 }
 
-- (void)handleStatus:(PNPublishStatus *)status client:(PubNub*)client {
+- (void)handleStatus:(PNStatus *)status client:(PubNub*)client {
     if (status.isError) {
+        [self.errorStreamHandler sendError:@{@"type":@"state", @"category":  [PubnubFlutterPlugin getCategoryAsNumber:status.category]}];
         NSDictionary *result = @{@"operation":  [PubnubFlutterPlugin getOperationAsNumber:status.operation], @"error": @""};
         [self.errorStreamHandler sendError:result];
         
     } else {
-        [self.statusStreamHandler sendStatus:status] ;
+         [self.statusStreamHandler sendStatus:status];
     }
 }
 
@@ -259,6 +174,9 @@ NSString *const CLIENT_NAME_KEY = @"clientName";
         
         // Message has been received on channel stored in message.data.channel.
     }
+    
+    NSLog(@"Received message: %@ on channel %@ uuid: %@ at %@", message.data.message[@"msg"],
+          message.data.channel, message.uuid, message.data.timetoken);
     
     [self.messageStreamHandler sendMessage:message];
 }
@@ -363,7 +281,7 @@ NSString *const CLIENT_NAME_KEY = @"clientName";
         case PNSetStateOperation:
             return [NSNumber numberWithInt:9];
         case PNGetStateOperation:
-            return [NSNumber numberWithInt:20];
+            return [NSNumber numberWithInt:21];
         case PNStateForChannelOperation:
             return [NSNumber numberWithInt:0];
         case PNStateForChannelGroupOperation:
@@ -388,9 +306,9 @@ NSString *const CLIENT_NAME_KEY = @"clientName";
             return [NSNumber numberWithInt:18];
         case PNTimeOperation:
             return [NSNumber numberWithInt:19];
-        default:
-            return [NSNumber numberWithInt:0];
     }
+    
+    return [NSNumber numberWithInt:0];
 }
 @end
 
@@ -432,13 +350,7 @@ NSString *const CLIENT_NAME_KEY = @"clientName";
 - (void) sendStatus:(PNStatus *)status {
     if(self.eventSink) {
         
-        NSArray<NSString *> *affectedChannels;
-        if (status.category == PNConnectedCategory || status.category == PNReconnectedCategory) {
-            PNSubscribeStatus *subscribeStatus = (PNSubscribeStatus *)status;
-            affectedChannels = subscribeStatus.subscribedChannels;
-        }
-        
-        self.eventSink(@{@"category": [PubnubFlutterPlugin getCategoryAsNumber:status.category],@"operation": [PubnubFlutterPlugin getOperationAsNumber:status.operation], @"uuid": status.uuid, @"channels": affectedChannels == NULL ? @[] : affectedChannels});
+        self.eventSink(@{@"category": [PubnubFlutterPlugin getCategoryAsNumber:status.category],@"operation": [PubnubFlutterPlugin getOperationAsNumber:status.operation], @"uuid": status.uuid});
     }
 }
 
@@ -458,8 +370,8 @@ NSString *const CLIENT_NAME_KEY = @"clientName";
 
 - (void) sendPresence:(PNPresenceEventResult *)presence {
     if(self.eventSink) {
-        NSLog(@"Presence state: %@", presence.data.presence.state);
-        self.eventSink(@{@"channel": presence.data.channel, @"event": presence.data.presenceEvent, @"uuid": presence.data.presence.uuid, @"occupancy": presence.data.presence.occupancy, @"state": presence.data.presence.state == NULL ? [NSDictionary new] : presence.data.presence.state});
+        
+        self.eventSink(@{@"channel": presence.data.channel, @"event": presence.data.presenceEvent, @"uuid": presence.data.presence.uuid, @"occupancy": presence.data.presence.occupancy});
     }
 }
 

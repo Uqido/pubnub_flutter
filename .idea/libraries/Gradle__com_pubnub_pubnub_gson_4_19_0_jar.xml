@@ -1,5 +1,5 @@
 <component name="libraryTable">
-  <library name="Gradle: com.pubnub:pubnub-gson:4.19.0@jar" type="AndroidModuleLibraryType">
+  <library name="Gradle: com.pubnub:pubnub-gson:4.19.0@jar">
     <CLASSES>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.pubnub/pubnub-gson/4.19.0/15e8b08a8dfce0c23b7ac5d2d0fa0add969962bf/pubnub-gson-4.19.0.jar!/" />
     </CLASSES>
