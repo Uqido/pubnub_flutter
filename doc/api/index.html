@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="generator" content="made with love by dartdoc 0.24.1">
+  <meta name="description" content="pubnub_flutter API docs, for the Dart programming language.">
+  <title>pubnub_flutter - Dart API docs</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500,400i,400,300|Source+Sans+Pro:400,300,700" rel="stylesheet">
+  <link rel="stylesheet" href="static-assets/github.css">
+  <link rel="stylesheet" href="static-assets/styles.css">
+  <link rel="icon" href="static-assets/favicon.png">
+
+</head>
+
+<body>
+
+<div id="overlay-under-drawer"></div>
+
+<header id="title">
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li class="self-crumb">pubnub_flutter package</li>
+  </ol>
+  <div class="self-name">pubnub_flutter</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+
+<main>
+
+  <div class="col-xs-6 col-sm-3 col-md-2 sidebar sidebar-offcanvas-left">
+    <h5><span class="package-name">pubnub_flutter</span> <span class="package-kind">package</span></h5>
+    <ol>
+          <li class="section-title">Libraries</li>
+          <li><a href="generated_i18n/generated_i18n-library.html">i18n</a></li>
+          <li><a href="pubnub_flutter/pubnub_flutter-library.html">pubnub_flutter</a></li>
+    </ol>
+  </div>
+
+  <div class="col-xs-12 col-sm-9 col-md-8 main-content">
+      <section class="desc markdown">
+        <h1 id="pubnubflutter">PubNubFlutter</h1>
+<p><a href="https://pub.dartlang.org/packages/pubnub"><img alt="pub package" src="https://img.shields.io/pub/v/pubnub.svg"></a></p>
+<p>A Flutter plugin to access PubNub functionalities such as publish, subscribe, status and presence..</p>
+<h2 id="usage">Usage</h2>
+<p>To use this plugin, add <code>pubnub_flutter</code> as a <a href="https://flutter.io/platform-plugins/">dependency in your pubspec.yaml file</a>.</p>
+<h3 id="example">Example</h3>
+<pre class="language-dart"><code class="language-dart">// Instantiate plugin without a filter expression:
+ _pubNubFlutter = PubNubFlutter('pub-c-2d1121f9-06c1-4413-8d2e-0000000000',
+        'sub-c-324ae474-ecfd-11e8-91a4-00000000000',
+        uuid: '127c1ab5-fc7f-4c46-8460-3207b6782007');
+        
+// Instantiate plugin with a filter expression:
+_pubNubFlutter = PubNubFlutter('pub-c-2d1121f9-06c1-4413-8d2e-0000000000',
+        'sub-c-324ae474-ecfd-11e8-91a4-00000000000',
+        uuid: '127c1ab5-fc7f-4c46-8460-3207b6782007',
+        filter: 'uuid != "127c1ab5-fc7f-4c46-8460-3207b6782007"');
+
+// Subscribe to a channel:
+_pubNubFlutter.subscribe(['test_channel']);
+
+// Unsubscribe from a channel:
+_pubNubFlutter.unsubscribe(channel: 'test_channel');
+
+//  Unsubscribe from all channels:
+_pubNubFlutter.unsubscribeAll();
+
+// Publish a message to a channel:
+_pubNubFlutter.publish(
+    {'message': 'Hello World'},
+    'test_channel',
+);
+
+// Publish a message to a channel passing metadata optional filter expression acts upon:
+_pubNubFlutter.publish(
+    {'message': 'Hello World'},
+    'test_channel',
+    metadata: {
+        'uuid': '127c1ab5-fc7f-4c46-8460-3207b6782007'
+    }
+);
+
+// Listen for Messages:
+_pubNubFlutter.onMessageReceived.listen((message) =&gt; print('Message:$message'));
+
+// Listen for Status:
+_pubNubFlutter.onStatusReceived.listen((status) =&gt; print('Status:${status.toString()}'));
+
+// Listen to Presence:
+_pubNubFlutter.onPresenceReceived.listen((presence) =&gt; print('Presence:${presence.toString()}'));
+
+// Listen for Errors:
+_pubNubFlutter.onErrorReceived.listen((error) =&gt; print('Error:$error'));
+</code></pre>
+      </section>
+      
+        <section class="summary">
+            <h2>Libraries</h2>
+          <dl>
+            <dt id="i18n">
+              <span class="name"><a href="generated_i18n/generated_i18n-library.html">i18n</a></span> 
+            </dt>
+            <dd>
+              
+            </dd>            <dt id="pubnub_flutter">
+              <span class="name"><a href="pubnub_flutter/pubnub_flutter-library.html">pubnub_flutter</a></span> 
+            </dt>
+            <dd>
+              
+            </dd>          </dl>
+        </section>
+
+  </div> <!-- /.main-content -->
+
+</main>
+
+<footer>
+  <span class="no-break">
+    pubnub_flutter 0.0.1
+  </span>
+
+</footer>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="static-assets/typeahead.bundle.min.js"></script>
+<script src="static-assets/highlight.pack.js"></script>
+<script src="static-assets/URI.js"></script>
+<script src="static-assets/script.js"></script>
+
+
+</body>
+
+</html>

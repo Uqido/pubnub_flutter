@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="API docs for the PubNubFlutter class from the pubnub_flutter library, for the Dart programming language.">
+  <title>PubNubFlutter class - pubnub_flutter library - Dart API</title>
+  <!-- required because all the links are pseudo-absolute -->
+  <base href="..">
+
+  <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500,400i,400,300|Source+Sans+Pro:400,300,700" rel="stylesheet">
+  <link rel="stylesheet" href="static-assets/github.css">
+  <link rel="stylesheet" href="static-assets/styles.css">
+  <link rel="icon" href="static-assets/favicon.png">
+
+</head>
+
+<body>
+
+<div id="overlay-under-drawer"></div>
+
+<header id="title">
+  <button id="sidenav-left-toggle" type="button">&nbsp;</button>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="index.html">pubnub_flutter</a></li>
+    <li><a href="pubnub_flutter/pubnub_flutter-library.html">pubnub_flutter</a></li>
+    <li class="self-crumb">PubNubFlutter class</li>
+  </ol>
+  <div class="self-name">PubNubFlutter</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+
+<main>
+
+  <div class="col-xs-6 col-sm-3 col-md-2 sidebar sidebar-offcanvas-left">
+    <h5>pubnub_flutter library</h5>
+    <ol>
+      <li class="section-title"><a href="pubnub_flutter/pubnub_flutter-library.html#classes">Classes</a></li>
+      <li><a href="pubnub_flutter/PubNubFlutter-class.html">PubNubFlutter</a></li>
+    
+    
+    
+    
+    
+      <li class="section-title"><a href="pubnub_flutter/pubnub_flutter-library.html#enums">Enums</a></li>
+      <li><a href="pubnub_flutter/PNOperationType-class.html">PNOperationType</a></li>
+      <li><a href="pubnub_flutter/PNStatusCategory-class.html">PNStatusCategory</a></li>
+    
+    
+    </ol>
+  </div>
+
+  <div class="col-xs-12 col-sm-9 col-md-8 main-content">
+      <h1>PubNubFlutter class </h1>
+
+    <section class="desc markdown">
+      <p>PubNub Plugin. This plugin is not intended to implement all PubNub functionalities but rather take a minimal approach
+for solving most general use cases
+Main areas covered by the plugin are</p><ul><li>Instantiate the plugin passing the required PubNub authentication information</li><li>Pass a filter expression when instantiating the plugin</li><li>Subscribe to one or more channels</li><li>Unsubscribe from one channel or all channels</li><li>Publish a message to a channel</li><li>Retrieve UUID if was not set during the plugin instantiation</li></ul>
+    </section>
+    
+
+    <section class="summary offset-anchor" id="constructors">
+      <h2>Constructors</h2>
+
+      <dl class="constructor-summary-list">
+        <dt id="PubNubFlutter" class="callable">
+          <span class="name"><a href="pubnub_flutter/PubNubFlutter/PubNubFlutter.html">PubNubFlutter</a></span><span class="signature">(<span class="parameter" id="-param-publishKey"><span class="type-annotation">String</span> <span class="parameter-name">publishKey</span>, </span> <span class="parameter" id="-param-subscribeKey"><span class="type-annotation">String</span> <span class="parameter-name">subscribeKey</span>, {</span> <span class="parameter" id="-param-uuid"><span class="type-annotation">String</span> <span class="parameter-name">uuid</span>, </span> <span class="parameter" id="-param-filter"><span class="type-annotation">String</span> <span class="parameter-name">filter</span></span> })</span>
+        </dt>
+        <dd>
+          Create the plugin, UUID and filter expressions are optional and can be used for tracking purposes and filtering purposes, for instance can disable getting messages on the same UUID.
+        </dd>
+      </dl>
+    </section>
+
+    <section class="summary offset-anchor" id="instance-properties">
+      <h2>Properties</h2>
+
+      <dl class="properties">
+        <dt id="onErrorReceived" class="property">
+          <span class="name"><a href="pubnub_flutter/PubNubFlutter/onErrorReceived.html">onErrorReceived</a></span>
+          <span class="signature">&#8594; Stream<span class="signature">&lt;<wbr><span class="type-parameter">Map</span>&gt;</span></span> 
+        </dt>
+        <dd>
+          Fires whenever an error is received.
+          <div class="features">read-only</div>
+</dd>
+        <dt id="onMessageReceived" class="property">
+          <span class="name"><a href="pubnub_flutter/PubNubFlutter/onMessageReceived.html">onMessageReceived</a></span>
+          <span class="signature">&#8594; Stream<span class="signature">&lt;<wbr><span class="type-parameter">Map</span>&gt;</span></span> 
+        </dt>
+        <dd>
+          Fires whenever the a message is received.
+          <div class="features">read-only</div>
+</dd>
+        <dt id="onPresenceReceived" class="property">
+          <span class="name"><a href="pubnub_flutter/PubNubFlutter/onPresenceReceived.html">onPresenceReceived</a></span>
+          <span class="signature">&#8594; Stream<span class="signature">&lt;<wbr><span class="type-parameter">Map</span>&gt;</span></span> 
+        </dt>
+        <dd>
+          Fires whenever the presence changes.
+          <div class="features">read-only</div>
+</dd>
+        <dt id="onStatusReceived" class="property">
+          <span class="name"><a href="pubnub_flutter/PubNubFlutter/onStatusReceived.html">onStatusReceived</a></span>
+          <span class="signature">&#8594; Stream<span class="signature">&lt;<wbr><span class="type-parameter">Map</span>&gt;</span></span> 
+        </dt>
+        <dd>
+          Fires whenever the status changes.
+          <div class="features">read-only</div>
+</dd>
+        <dt id="hashCode" class="property inherited">
+          <span class="name"><a href="pubnub_flutter/PubNubFlutter/hashCode.html">hashCode</a></span>
+          <span class="signature">&#8594; int</span> 
+        </dt>
+        <dd class="inherited">
+          The hash code for this object. <a href="pubnub_flutter/PubNubFlutter/hashCode.html">[...]</a>
+          <div class="features">read-only, inherited</div>
+</dd>
+        <dt id="runtimeType" class="property inherited">
+          <span class="name"><a href="pubnub_flutter/PubNubFlutter/runtimeType.html">runtimeType</a></span>
+          <span class="signature">&#8594; Type</span> 
+        </dt>
+        <dd class="inherited">
+          A representation of the runtime type of the object.
+          <div class="features">read-only, inherited</div>
+</dd>
+      </dl>
+    </section>
+
+    <section class="summary offset-anchor" id="instance-methods">
+      <h2>Methods</h2>
+      <dl class="callables">
+        <dt id="publish" class="callable">
+          <span class="name"><a href="pubnub_flutter/PubNubFlutter/publish.html">publish</a></span><span class="signature">(<wbr><span class="parameter" id="publish-param-message"><span class="type-annotation">Map</span> <span class="parameter-name">message</span>, </span> <span class="parameter" id="publish-param-channel"><span class="type-annotation">String</span> <span class="parameter-name">channel</span>, {</span> <span class="parameter" id="publish-param-metadata"><span class="type-annotation">Map</span> <span class="parameter-name">metadata</span></span> })
+            <span class="returntype parameter">&#8594; Future<span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+          </span>
+          </dt>
+        <dd>
+          Publishes a message on a specified channel, some metadata can be passed and used in conjunction with filter expressions
+          
+</dd>
+        <dt id="subscribe" class="callable">
+          <span class="name"><a href="pubnub_flutter/PubNubFlutter/subscribe.html">subscribe</a></span><span class="signature">(<wbr><span class="parameter" id="subscribe-param-channels"><span class="type-annotation">List<span class="signature">&lt;<wbr><span class="type-parameter">String</span>&gt;</span></span> <span class="parameter-name">channels</span></span>)
+            <span class="returntype parameter">&#8594; Future<span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+          </span>
+          </dt>
+        <dd>
+          Subscribe to a list of channels
+          
+</dd>
+        <dt id="unsubscribe" class="callable">
+          <span class="name"><a href="pubnub_flutter/PubNubFlutter/unsubscribe.html">unsubscribe</a></span><span class="signature">(<wbr>{<span class="parameter" id="unsubscribe-param-channel"><span class="type-annotation">String</span> <span class="parameter-name">channel</span></span> })
+            <span class="returntype parameter">&#8594; Future<span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+          </span>
+          </dt>
+        <dd>
+          Unsubscribes from a single channel
+          
+</dd>
+        <dt id="unsubscribeAll" class="callable">
+          <span class="name"><a href="pubnub_flutter/PubNubFlutter/unsubscribeAll.html">unsubscribeAll</a></span><span class="signature">(<wbr>)
+            <span class="returntype parameter">&#8594; Future<span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+          </span>
+          </dt>
+        <dd>
+          Unsubscribes from all channels
+          
+</dd>
+        <dt id="uuid" class="callable">
+          <span class="name"><a href="pubnub_flutter/PubNubFlutter/uuid.html">uuid</a></span><span class="signature">(<wbr>)
+            <span class="returntype parameter">&#8594; Future<span class="signature">&lt;<wbr><span class="type-parameter">String</span>&gt;</span></span>
+          </span>
+          </dt>
+        <dd>
+          Get the UUID configured for PubNub. Note that when the UUID is passed  in the plugin creation, the returned UUID is the same
+If the UUID has not been passed in the plugin creation, then PubNub assigns a new UUID. This may be important for tracking how many devices/clients are using the API and
+may impact how much the service costs
+          
+</dd>
+        <dt id="noSuchMethod" class="callable inherited">
+          <span class="name"><a href="pubnub_flutter/PubNubFlutter/noSuchMethod.html">noSuchMethod</a></span><span class="signature">(<wbr><span class="parameter" id="noSuchMethod-param-invocation"><span class="type-annotation">Invocation</span> <span class="parameter-name">invocation</span></span>)
+            <span class="returntype parameter">&#8594; dynamic</span>
+          </span>
+          </dt>
+        <dd class="inherited">
+          Invoked when a non-existent method or property is accessed. <a href="pubnub_flutter/PubNubFlutter/noSuchMethod.html">[...]</a>
+          <div class="features">inherited</div>
+</dd>
+        <dt id="toString" class="callable inherited">
+          <span class="name"><a href="pubnub_flutter/PubNubFlutter/toString.html">toString</a></span><span class="signature">(<wbr>)
+            <span class="returntype parameter">&#8594; String</span>
+          </span>
+          </dt>
+        <dd class="inherited">
+          Returns a string representation of this object.
+          <div class="features">inherited</div>
+</dd>
+      </dl>
+    </section>
+
+    <section class="summary offset-anchor inherited" id="operators">
+      <h2>Operators</h2>
+      <dl class="callables">
+        <dt id="operator ==" class="callable inherited">
+          <span class="name"><a href="pubnub_flutter/PubNubFlutter/operator_equals.html">operator ==</a></span><span class="signature">(<wbr><span class="parameter" id="==-param-other"><span class="type-annotation">dynamic</span> <span class="parameter-name">other</span></span>)
+            <span class="returntype parameter">&#8594; bool</span>
+          </span>
+          </dt>
+        <dd class="inherited">
+          The equality operator. <a href="pubnub_flutter/PubNubFlutter/operator_equals.html">[...]</a>
+          <div class="features">inherited</div>
+</dd>
+      </dl>
+    </section>
+
+
+
+
+  </div> <!-- /.main-content -->
+
+  <div class="col-xs-6 col-sm-6 col-md-2 sidebar sidebar-offcanvas-right">
+    <ol>
+      <li class="section-title"><a href="pubnub_flutter/PubNubFlutter-class.html#constructors">Constructors</a></li>
+      <li><a href="pubnub_flutter/PubNubFlutter/PubNubFlutter.html">PubNubFlutter</a></li>
+    
+      <li class="section-title">
+        <a href="pubnub_flutter/PubNubFlutter-class.html#instance-properties">Properties</a>
+      </li>
+      <li><a href="pubnub_flutter/PubNubFlutter/onErrorReceived.html">onErrorReceived</a></li>
+      <li><a href="pubnub_flutter/PubNubFlutter/onMessageReceived.html">onMessageReceived</a></li>
+      <li><a href="pubnub_flutter/PubNubFlutter/onPresenceReceived.html">onPresenceReceived</a></li>
+      <li><a href="pubnub_flutter/PubNubFlutter/onStatusReceived.html">onStatusReceived</a></li>
+      <li class="inherited"><a href="pubnub_flutter/PubNubFlutter/hashCode.html">hashCode</a></li>
+      <li class="inherited"><a href="pubnub_flutter/PubNubFlutter/runtimeType.html">runtimeType</a></li>
+    
+      <li class="section-title"><a href="pubnub_flutter/PubNubFlutter-class.html#instance-methods">Methods</a></li>
+      <li><a href="pubnub_flutter/PubNubFlutter/publish.html">publish</a></li>
+      <li><a href="pubnub_flutter/PubNubFlutter/subscribe.html">subscribe</a></li>
+      <li><a href="pubnub_flutter/PubNubFlutter/unsubscribe.html">unsubscribe</a></li>
+      <li><a href="pubnub_flutter/PubNubFlutter/unsubscribeAll.html">unsubscribeAll</a></li>
+      <li><a href="pubnub_flutter/PubNubFlutter/uuid.html">uuid</a></li>
+      <li class="inherited"><a href="pubnub_flutter/PubNubFlutter/noSuchMethod.html">noSuchMethod</a></li>
+      <li class="inherited"><a href="pubnub_flutter/PubNubFlutter/toString.html">toString</a></li>
+    
+      <li class="section-title inherited"><a href="pubnub_flutter/PubNubFlutter-class.html#operators">Operators</a></li>
+      <li class="inherited"><a href="pubnub_flutter/PubNubFlutter/operator_equals.html">operator ==</a></li>
+    
+    
+    
+    </ol>
+  </div><!--/.sidebar-offcanvas-->
+
+</main>
+
+<footer>
+  <span class="no-break">
+    pubnub_flutter 0.0.1
+  </span>
+
+</footer>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="static-assets/typeahead.bundle.min.js"></script>
+<script src="static-assets/highlight.pack.js"></script>
+<script src="static-assets/URI.js"></script>
+<script src="static-assets/script.js"></script>
+
+
+</body>
+
+</html>

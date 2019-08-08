@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'package:pubnub_flutter/pubnub_flutter.dart';
 
 void main() => runApp(MyApp());
@@ -10,46 +9,79 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String _platformVersion = 'Unknown';
   PubNubFlutter _pubNubFlutter;
 
   @override
   void initState() {
     super.initState();
-    _pubNubFlutter = PubNubFlutter("pub-c-2d1121f9-06c1-4413-8d2e-865f0cfe702a", "sub-c-324ae474-ecfd-11e8-91a4-7e00ddddd7aa");
+    _pubNubFlutter = PubNubFlutter('pub-c-2d1121f9-06c1-4413-8d2e-865f0cfe702a',
+        'sub-c-324ae474-ecfd-11e8-91a4-7e00ddddd7aa',
+        uuid: '127c1ab5-fc7f-4c46-8460-3207b6782007',
+        filter: 'uuid != "127c1ab5-fc7f-4c46-8460-3207b6782007"');
 
-    _pubNubFlutter.onStatusReceived.listen((status) {
-      print("Status:${status.toString()}");
-    });
+    _pubNubFlutter.uuid().then((uuid) => print('UUID: $uuid'));
 
-    _pubNubFlutter.onMessageReceived.listen((message) {
-      print("Message:${message}");
-    });
+    _pubNubFlutter.onStatusReceived
+        .listen((status) => print('Status:${status.toString()}'));
 
-    _pubNubFlutter.onErrorReceived.listen((error) {
-      print("Error:${error}");
-    });
+    _pubNubFlutter.onPresenceReceived
+        .listen((presence) => print('Presence:${presence.toString()}'));
+
+    _pubNubFlutter.onMessageReceived
+        .listen((message) => print('Message:$message'));
+
+    _pubNubFlutter.onErrorReceived.listen((error) => print('Error:$error'));
   }
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('PubNub'),
-        ),
-        body: Center(
-          child:Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-            Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children:<Widget>[
-            FlatButton(color: Colors.black12,onPressed: () {_pubNubFlutter.unsubscribe(channel: "olivier_channel");},
-            child: Text("Unsubscribe")),
-            FlatButton(color: Colors.black12,onPressed: () {_pubNubFlutter.subscribe(["olivier_channel"]);},
-                child: Text("Subscribe"))
-              ])
-          ],)
-        ),
-      ),
-    );
+  void dispose() {
+    print('Unsubscribe all');
+    _pubNubFlutter.unsubscribeAll();
+    super.dispose();
   }
+
+  @override
+  Widget build(BuildContext context) => MaterialApp(
+        home: Scaffold(
+          appBar: AppBar(
+            title: const Text('PubNub'),
+          ),
+          body: Center(
+              child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    FlatButton(
+                        color: Colors.black12,
+                        onPressed: () {
+                          _pubNubFlutter.unsubscribe(
+                              channel: 'olivier_channel');
+                        },
+                        child: Text('Unsubscribe')),
+                    FlatButton(
+                        color: Colors.black12,
+                        onPressed: () {
+                          _pubNubFlutter.subscribe(['olivier_channel']);
+                        },
+                        child: Text('Subscribe')),
+                    FlatButton(
+                        color: Colors.black12,
+                        onPressed: () {
+                          _pubNubFlutter.publish(
+                            {'message': 'Hello World'},
+                            'olivier_channel',
+                          );
+                          // Below is used to filter the uuid, works in combination with the filter expression in the create method above
+                          //metadata: {
+                          //  'uuid': '127c1ab5-fc7f-4c46-8460-3207b6782007'
+                          //});
+                        },
+                        child: Text('Send Message'))
+                  ])
+            ],
+          )),
+        ),
+      );
 }
